@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { Sidebar } from '@/components/layout/sidebar'
+import { BottomNav } from '@/components/layout/bottom-nav'
 import { useAppStore } from '@/store'
 import { Profile } from '@/types'
 import { User } from '@supabase/supabase-js'
@@ -27,9 +28,10 @@ export function DashboardClient({ children, profile, user }: DashboardClientProp
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
       <Sidebar />
-      <main className={`flex-1 overflow-y-auto transition-all duration-300`}>
+      <main className="flex-1 overflow-y-auto transition-all duration-300 pb-16 lg:pb-0">
         {children}
       </main>
+      <BottomNav />
     </div>
   )
 }
