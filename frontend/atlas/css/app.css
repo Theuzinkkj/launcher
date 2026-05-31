@@ -191,6 +191,27 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 14px;
 }
 
+.auth-error {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 12px;
+  text-align: left;
+  display: none;
+}
+[data-theme="dark"] .auth-error { background: rgba(185,28,28,.2); color: #fca5a5; }
+
+.vault-subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.vault-unlock-card .form-group { text-align: left; }
+.vault-unlock-card label { font-size: 13px; font-weight: 500; color: var(--text-muted); display: block; margin-bottom: 6px; }
+
 /* ============================================================
    6. APP LAYOUT
    ============================================================ */

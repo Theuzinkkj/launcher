@@ -563,24 +563,42 @@
     const pw = document.getElementById('vaultSetupPassword').value;
     const pw2 = document.getElementById('vaultSetupConfirm').value;
     const err = document.getElementById('vaultSetupError');
-    if (!pw || pw.length < 4) { err.textContent='Senha muito curta.'; err.style.display='block'; return; }
+    const btn = document.querySelector('#vaultSetupForm .btn-atlas');
+    err.style.display = 'none';
+    if (!pw || pw.length < 4) { err.textContent='Senha muito curta (mínimo 4 caracteres).'; err.style.display='block'; return; }
     if (pw !== pw2) { err.textContent='Senhas não conferem.'; err.style.display='block'; return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Configurando…'; }
     CryptoManager.hashPassword(pw).then(({hash,salt}) => {
       Storage.set('vault.masterHash', hash);
       Storage.set('vault.salt', salt);
       Storage.set('vault._unlocked', true);
       AtlasApp.launchApp();
+    }).catch(e => {
+      err.textContent = 'Erro ao configurar cofre: ' + (e && e.message ? e.message : 'tente novamente.');
+      err.style.display = 'block';
+      if (btn) { btn.disabled = false; btn.textContent = 'Configurar cofre'; }
     });
   }
   function unlockVault() {
     const pw = document.getElementById('vaultUnlockPassword').value;
     const err = document.getElementById('vaultUnlockError');
+    const btn = document.querySelector('#vaultUnlockForm .btn-atlas');
+    err.style.display = 'none';
     const hash = Storage.get('vault.masterHash');
     const salt = Storage.get('vault.salt');
     if (!hash || !salt) { AtlasApp.launchApp(); return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Verificando…'; }
     CryptoManager.verifyPassword(pw, hash, salt).then(ok => {
       if (ok) { Storage.set('vault._unlocked', true); AtlasApp.launchApp(); }
-      else { err.textContent='Senha incorreta.'; err.style.display='block'; }
+      else {
+        err.textContent = 'Senha incorreta.';
+        err.style.display = 'block';
+        if (btn) { btn.disabled = false; btn.textContent = 'Desbloquear'; }
+      }
+    }).catch(e => {
+      err.textContent = 'Erro ao verificar senha: ' + (e && e.message ? e.message : 'tente novamente.');
+      err.style.display = 'block';
+      if (btn) { btn.disabled = false; btn.textContent = 'Desbloquear'; }
     });
   }
 </script>
