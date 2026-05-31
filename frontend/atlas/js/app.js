@@ -33,7 +33,7 @@ const AtlasApp = (() => {
 
   async function checkVaultSetup() {
     document.getElementById('loadingScreen').style.display = 'none';
-    if (sessionStorage.getItem('atlas_vault_session')) { launchApp(); return; }
+    if (sessionStorage.getItem('atlas_vault_session') || Storage.get('vault._unlocked')) { launchApp(); return; }
     const masterHash = Storage.get('vault.masterHash');
     const screen = document.getElementById('vaultUnlockScreen');
     screen.classList.remove('hidden');

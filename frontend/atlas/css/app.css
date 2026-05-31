@@ -92,6 +92,8 @@ body {
   overflow-x: hidden;
 }
 
+.hidden { display: none !important; }
+
 a { color: var(--primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
