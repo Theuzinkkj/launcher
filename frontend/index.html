@@ -81,56 +81,68 @@
     /* Launcher */
     #launcherScreen { display: none; min-height: 100vh; flex-direction: column; }
     #launcherScreen.visible { display: flex; }
-    .launcher-header { padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .launcher-header { padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
     .launcher-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
     .launcher-brand svg { width: 32px; height: 32px; }
     .launcher-header-right { display: flex; align-items: center; gap: 12px; }
     .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
-    .user-avatar { width: 32px; height: 32px; background: var(--atlas); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600; }
-    .btn-icon { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .user-avatar { width: 34px; height: 34px; background: linear-gradient(135deg, var(--atlas), var(--atlas-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600; box-shadow: 0 2px 8px rgba(99,102,241,0.3); }
+    .btn-icon { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
     .btn-icon:hover { background: var(--bg); color: var(--text); }
-    .btn-logout { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .2s; }
+    .btn-logout { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .2s; }
     .btn-logout:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
-    .launcher-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; }
-    .launcher-greeting { text-align: center; margin-bottom: 48px; }
-    .launcher-greeting h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
-    .launcher-greeting p { color: var(--text-muted); font-size: 16px; }
-    .apps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 380px)); gap: 24px; max-width: 840px; width: 100%; }
-    .app-card {
-      display: block; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0; overflow: hidden; transition: all .3s; cursor: pointer; box-shadow: var(--shadow);
+    [data-theme="dark"] .btn-logout:hover { background: rgba(185,28,28,.15); }
+
+    .launcher-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; gap: 56px; }
+    .launcher-greeting { text-align: center; }
+    .launcher-greeting h2 { font-size: 30px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+    .launcher-greeting p { color: var(--text-muted); font-size: 15px; }
+
+    /* Icon dock */
+    .apps-dock { display: flex; align-items: flex-end; gap: 32px; }
+    .app-icon-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; outline: none; border: none; background: none; padding: 0;
     }
-    .app-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-    .app-card-top { height: 5px; }
-    .app-card.atlas .app-card-top { background: var(--atlas); }
-    .app-card.fit .app-card-top { background: var(--fit); }
-    .app-card-body { padding: 28px; }
-    .app-card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
-    .app-card.atlas .app-card-icon { background: var(--atlas-light); }
-    .app-card.fit .app-card-icon { background: var(--fit-light); }
-    .app-card-icon svg { width: 28px; height: 28px; }
-    .app-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
-    .app-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
-    .app-card-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
-    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-    .app-card.atlas .badge { background: var(--atlas-light); color: var(--atlas); }
-    .app-card.fit .badge { background: var(--fit-light); color: var(--fit); }
-    [data-theme="dark"] .app-card.atlas .badge { color: #a5b4fc; }
-    [data-theme="dark"] .app-card.fit .badge { color: #6ee7b7; }
-    .app-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border); }
-    .app-card-footer span { font-size: 13px; font-weight: 600; }
-    .app-card.atlas .app-card-footer span { color: var(--atlas); }
-    .app-card.fit .app-card-footer span { color: var(--fit); }
-    .app-card-arrow { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
-    .app-card.atlas .app-card-arrow { background: var(--atlas-light); color: var(--atlas); }
-    .app-card.fit .app-card-arrow { background: var(--fit-light); color: var(--fit); }
-    .app-card:hover .app-card-arrow { transform: translateX(4px); }
+    .app-icon-wrap {
+      width: 88px; height: 88px; border-radius: 22px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease;
+      position: relative; overflow: hidden;
+    }
+    .app-icon-wrap::after {
+      content: ''; position: absolute; inset: 0; opacity: 0;
+      transition: opacity .2s;
+      background: rgba(255,255,255,0.15);
+    }
+    .app-icon-btn:hover .app-icon-wrap { transform: translateY(-8px) scale(1.06); box-shadow: 0 20px 48px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.08); }
+    .app-icon-btn:hover .app-icon-wrap::after { opacity: 1; }
+    .app-icon-btn:active .app-icon-wrap { transform: translateY(-2px) scale(0.98); }
+    .app-icon-wrap svg { position: relative; z-index: 1; }
+    .app-icon-wrap.atlas { background: linear-gradient(145deg, #818cf8, #6366f1, #4f46e5); }
+    .app-icon-wrap.fit { background: linear-gradient(145deg, #34d399, #10b981, #059669); }
+    .app-icon-label { font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.2px; transition: color .2s; }
+    .app-icon-btn:hover .app-icon-label { color: var(--text); }
+
+    /* Dock glass shelf */
+    .dock-shelf {
+      background: rgba(255,255,255,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.9); border-radius: 28px; padding: 20px 36px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    [data-theme="dark"] .dock-shelf {
+      background: rgba(30,41,59,0.7);
+      border-color: rgba(255,255,255,0.08);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
 
     @media (max-width: 640px) {
-      .apps-grid { grid-template-columns: 1fr; }
       .launcher-header { padding: 16px 20px; }
       .launcher-brand span { display: none; }
       .user-info span { display: none; }
-      .launcher-greeting h2 { font-size: 22px; }
+      .launcher-greeting h2 { font-size: 24px; }
+      .apps-dock { gap: 20px; }
+      .app-icon-wrap { width: 72px; height: 72px; border-radius: 18px; }
+      .dock-shelf { padding: 16px 24px; border-radius: 22px; }
     }
   </style>
 </head>
@@ -232,59 +244,26 @@
         <h2 id="greeting">Olá!</h2>
         <p id="launcherDate"></p>
       </div>
-      <div class="apps-grid">
-        <a href="/atlas" class="app-card atlas">
-          <div class="app-card-top"></div>
-          <div class="app-card-body">
-            <div class="app-card-icon">
-              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="14,3 25,23 3,23" fill="#6366f1"/>
-                <circle cx="14" cy="12" r="4" fill="white"/>
+      <div class="dock-shelf">
+        <div class="apps-dock">
+          <a href="/atlas" class="app-icon-btn">
+            <div class="app-icon-wrap atlas">
+              <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="22,6 38,36 6,36" fill="rgba(255,255,255,0.95)"/>
+                <circle cx="22" cy="20" r="6" fill="rgba(79,70,229,0.85)"/>
               </svg>
             </div>
-            <h3>Atlas Hub</h3>
-            <p>Seu hub de produtividade pessoal com notas, tarefas, metas, agenda e assistente com IA.</p>
-            <div class="app-card-badges">
-              <span class="badge">📝 Notas</span>
-              <span class="badge">✅ Tarefas</span>
-              <span class="badge">🎯 Metas</span>
-              <span class="badge">📅 Agenda</span>
-              <span class="badge">🤖 IA</span>
-              <span class="badge">🔐 Cofre</span>
-            </div>
-            <div class="app-card-footer">
-              <span>Abrir Atlas Hub</span>
-              <div class="app-card-arrow">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="/fitness" class="app-card fit">
-          <div class="app-card-top"></div>
-          <div class="app-card-body">
-            <div class="app-card-icon">
-              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 14h3l2-6 4 12 3-8 2 4h6" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <span class="app-icon-label">Atlas</span>
+          </a>
+          <a href="/fitness" class="app-icon-btn">
+            <div class="app-icon-wrap fit">
+              <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 22h5l3-9 6 18 5-12 3 6h10" stroke="rgba(255,255,255,0.95)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
               </svg>
             </div>
-            <h3>FitHub</h3>
-            <p>Seu companheiro fitness com treinos, nutrição, progresso corporal e FitBot com IA.</p>
-            <div class="app-card-badges">
-              <span class="badge">💪 Treinos</span>
-              <span class="badge">🥗 Nutrição</span>
-              <span class="badge">📊 Progresso</span>
-              <span class="badge">💧 Hidratação</span>
-              <span class="badge">🤖 FitBot</span>
-            </div>
-            <div class="app-card-footer">
-              <span>Abrir FitHub</span>
-              <div class="app-card-arrow">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </div>
-            </div>
-          </div>
-        </a>
+            <span class="app-icon-label">FitHub</span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
