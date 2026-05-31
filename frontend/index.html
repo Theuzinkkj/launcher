@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <title>Hub Pessoal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --atlas: #6366f1;
+      --atlas-dark: #4f46e5;
+      --atlas-light: #eef2ff;
+      --fit: #10b981;
+      --fit-dark: #059669;
+      --fit-light: #ecfdf5;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --border: #334155;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --atlas-light: #1e1b4b;
+      --fit-light: #022c22;
+      --shadow: 0 4px 24px rgba(0,0,0,0.3);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background .3s, color .3s; }
+
+    /* Loading Screen */
+    #loadingScreen {
+      position: fixed; inset: 0; background: var(--atlas); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 20px;
+    }
+    #loadingScreen .logo { animation: pulse 1.5s ease-in-out infinite; }
+    #loadingScreen .logo svg { width: 72px; height: 72px; }
+    #loadingScreen p { color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; }
+    .loading-bar { width: 160px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; }
+    .loading-bar-inner { height: 100%; background: white; border-radius: 99px; animation: loadbar 1.8s ease-in-out infinite; }
+    @keyframes loadbar { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+    /* Auth Screen */
+    #authScreen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 24px; }
+    #authScreen.visible { display: flex; }
+    .auth-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px; width: 100%; max-width: 420px; box-shadow: var(--shadow-lg);
+    }
+    .auth-logo { text-align: center; margin-bottom: 28px; }
+    .auth-logo svg { width: 52px; height: 52px; margin: 0 auto 12px; display: block; }
+    .auth-logo h1 { font-size: 22px; font-weight: 800; color: var(--text); }
+    .auth-logo p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+    .auth-tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 10px; padding: 4px; margin-bottom: 24px; }
+    .auth-tab { flex: 1; padding: 8px; text-align: center; font-size: 14px; font-weight: 500; border: none; background: none; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: all .2s; }
+    .auth-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+    input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: var(--bg); color: var(--text); transition: border-color .2s, box-shadow .2s; outline: none; }
+    input:focus { border-color: var(--atlas); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all .2s; font-family: inherit; }
+    .btn-primary { background: var(--atlas); color: white; width: 100%; }
+    .btn-primary:hover { background: var(--atlas-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+    .btn-link { background: none; color: var(--atlas); font-size: 13px; padding: 0; text-decoration: underline; cursor: pointer; border: none; font-family: inherit; }
+    .auth-footer { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+    .auth-error { background: #fee2e2; color: #b91c1c; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .auth-success { background: #dcfce7; color: #15803d; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+    [data-theme="dark"] .auth-error { background: rgba(185,28,28,.2); color: #fca5a5; }
+    [data-theme="dark"] .auth-success { background: rgba(21,128,61,.2); color: #86efac; }
+
+    /* Launcher */
+    #launcherScreen { display: none; min-height: 100vh; flex-direction: column; }
+    #launcherScreen.visible { display: flex; }
+    .launcher-header { padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .launcher-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+    .launcher-brand svg { width: 32px; height: 32px; }
+    .launcher-header-right { display: flex; align-items: center; gap: 12px; }
+    .user-info { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+    .user-avatar { width: 32px; height: 32px; background: var(--atlas); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600; }
+    .btn-icon { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .btn-icon:hover { background: var(--bg); color: var(--text); }
+    .btn-logout { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .2s; }
+    .btn-logout:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+    .launcher-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; }
+    .launcher-greeting { text-align: center; margin-bottom: 48px; }
+    .launcher-greeting h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .launcher-greeting p { color: var(--text-muted); font-size: 16px; }
+    .apps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 380px)); gap: 24px; max-width: 840px; width: 100%; }
+    .app-card {
+      display: block; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0; overflow: hidden; transition: all .3s; cursor: pointer; box-shadow: var(--shadow);
+    }
+    .app-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .app-card-top { height: 5px; }
+    .app-card.atlas .app-card-top { background: var(--atlas); }
+    .app-card.fit .app-card-top { background: var(--fit); }
+    .app-card-body { padding: 28px; }
+    .app-card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+    .app-card.atlas .app-card-icon { background: var(--atlas-light); }
+    .app-card.fit .app-card-icon { background: var(--fit-light); }
+    .app-card-icon svg { width: 28px; height: 28px; }
+    .app-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .app-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+    .app-card-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; }
+    .app-card.atlas .badge { background: var(--atlas-light); color: var(--atlas); }
+    .app-card.fit .badge { background: var(--fit-light); color: var(--fit); }
+    [data-theme="dark"] .app-card.atlas .badge { color: #a5b4fc; }
+    [data-theme="dark"] .app-card.fit .badge { color: #6ee7b7; }
+    .app-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid var(--border); }
+    .app-card-footer span { font-size: 13px; font-weight: 600; }
+    .app-card.atlas .app-card-footer span { color: var(--atlas); }
+    .app-card.fit .app-card-footer span { color: var(--fit); }
+    .app-card-arrow { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+    .app-card.atlas .app-card-arrow { background: var(--atlas-light); color: var(--atlas); }
+    .app-card.fit .app-card-arrow { background: var(--fit-light); color: var(--fit); }
+    .app-card:hover .app-card-arrow { transform: translateX(4px); }
+
+    @media (max-width: 640px) {
+      .apps-grid { grid-template-columns: 1fr; }
+      .launcher-header { padding: 16px 20px; }
+      .launcher-brand span { display: none; }
+      .user-info span { display: none; }
+      .launcher-greeting h2 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <div class="logo">
+      <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="36" r="36" fill="rgba(255,255,255,0.15)"/>
+        <polygon points="36,14 60,58 12,58" fill="white"/>
+        <circle cx="36" cy="32" r="8" fill="rgba(99,102,241,0.9)"/>
+      </svg>
+    </div>
+    <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+    <p>Carregando Hub Pessoal…</p>
+  </div>
+
+  <!-- Auth Screen -->
+  <div id="authScreen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="26" cy="26" r="26" fill="#6366f1"/>
+          <polygon points="26,10 44,42 8,42" fill="white"/>
+          <circle cx="26" cy="24" r="6" fill="#6366f1"/>
+        </svg>
+        <h1>Hub Pessoal</h1>
+        <p>Seu espaço de produtividade e bem-estar</p>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showLogin()">Entrar</button>
+        <button class="auth-tab" onclick="showRegister()">Criar conta</button>
+      </div>
+
+      <!-- Login form -->
+      <div id="loginForm">
+        <div id="loginError" class="auth-error"></div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="authEmail" placeholder="seu@email.com" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="authPassword" placeholder="Sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
+        </div>
+        <button class="btn btn-primary" onclick="login()" id="loginBtn">Entrar</button>
+        <div class="auth-footer">
+          <button class="btn-link" onclick="forgotPassword()">Esqueci minha senha</button>
+        </div>
+      </div>
+
+      <!-- Register form -->
+      <div id="registerForm" style="display:none">
+        <div id="registerError" class="auth-error"></div>
+        <div id="registerSuccess" class="auth-success"></div>
+        <div class="form-group">
+          <label>Nome (opcional)</label>
+          <input type="text" id="authName" placeholder="Seu nome"/>
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="authRegEmail" placeholder="seu@email.com" autocomplete="email"/>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="authRegPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password" onkeydown="if(event.key==='Enter')register()"/>
+        </div>
+        <button class="btn btn-primary" onclick="register()" id="registerBtn">Criar conta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Launcher Screen -->
+  <div id="launcherScreen">
+    <header class="launcher-header">
+      <div class="launcher-brand">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="16" fill="#6366f1"/>
+          <polygon points="16,6 26,24 6,24" fill="white"/>
+          <circle cx="16" cy="14" r="4" fill="#6366f1"/>
+        </svg>
+        <span>Hub Pessoal</span>
+      </div>
+      <div class="launcher-header-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <span id="userDisplayName"></span>
+        </div>
+        <button class="btn-icon" onclick="toggleTheme()" title="Alternar tema">
+          <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <button class="btn-logout" onclick="logout()">Sair</button>
+      </div>
+    </header>
+    <div class="launcher-body">
+      <div class="launcher-greeting">
+        <h2 id="greeting">Olá!</h2>
+        <p id="launcherDate"></p>
+      </div>
+      <div class="apps-grid">
+        <a href="/atlas" class="app-card atlas">
+          <div class="app-card-top"></div>
+          <div class="app-card-body">
+            <div class="app-card-icon">
+              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="14,3 25,23 3,23" fill="#6366f1"/>
+                <circle cx="14" cy="12" r="4" fill="white"/>
+              </svg>
+            </div>
+            <h3>Atlas Hub</h3>
+            <p>Seu hub de produtividade pessoal com notas, tarefas, metas, agenda e assistente com IA.</p>
+            <div class="app-card-badges">
+              <span class="badge">📝 Notas</span>
+              <span class="badge">✅ Tarefas</span>
+              <span class="badge">🎯 Metas</span>
+              <span class="badge">📅 Agenda</span>
+              <span class="badge">🤖 IA</span>
+              <span class="badge">🔐 Cofre</span>
+            </div>
+            <div class="app-card-footer">
+              <span>Abrir Atlas Hub</span>
+              <div class="app-card-arrow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </div>
+          </div>
+        </a>
+        <a href="/fitness" class="app-card fit">
+          <div class="app-card-top"></div>
+          <div class="app-card-body">
+            <div class="app-card-icon">
+              <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 14h3l2-6 4 12 3-8 2 4h6" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <h3>FitHub</h3>
+            <p>Seu companheiro fitness com treinos, nutrição, progresso corporal e FitBot com IA.</p>
+            <div class="app-card-badges">
+              <span class="badge">💪 Treinos</span>
+              <span class="badge">🥗 Nutrição</span>
+              <span class="badge">📊 Progresso</span>
+              <span class="badge">💧 Hidratação</span>
+              <span class="badge">🤖 FitBot</span>
+            </div>
+            <div class="app-card-footer">
+              <span>Abrir FitHub</span>
+              <div class="app-card-arrow">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin + '/api';
+    let _token = localStorage.getItem('atlas_token');
+
+    async function apiFetch(path, opts = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (_token) headers['Authorization'] = 'Bearer ' + _token;
+      const res = await fetch(API_BASE + path, { ...opts, headers: { ...headers, ...(opts.headers || {}) } });
+      const data = await res.json().catch(() => ({}));
+      return { ok: res.ok, status: res.status, data };
+    }
+
+    async function init() {
+      applyTheme();
+      if (_token) {
+        const res = await apiFetch('/auth/me');
+        if (res.ok && res.data?.user) {
+          showLauncher(res.data.user);
+          return;
+        } else {
+          localStorage.removeItem('atlas_token');
+          localStorage.removeItem('atlas_refresh');
+          localStorage.removeItem('atlas_user');
+          _token = null;
+        }
+      }
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('authScreen').classList.add('visible');
+    }
+
+    function showLauncher(user) {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('authScreen').classList.remove('visible');
+      document.getElementById('launcherScreen').classList.add('visible');
+      const name = user.user_metadata?.name || user.email?.split('@')[0] || 'usuário';
+      const hr = new Date().getHours();
+      const greet = hr < 12 ? 'Bom dia' : hr < 18 ? 'Boa tarde' : 'Boa noite';
+      document.getElementById('greeting').textContent = greet + ', ' + name + '!';
+      document.getElementById('userDisplayName').textContent = name;
+      document.getElementById('userAvatar').textContent = name[0].toUpperCase();
+      const days = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+      const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+      const d = new Date();
+      document.getElementById('launcherDate').textContent = days[d.getDay()] + ', ' + d.getDate() + ' de ' + months[d.getMonth()] + ' de ' + d.getFullYear();
+    }
+
+    async function login() {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+      if (!email || !password) { errEl.textContent = 'Preencha todos os campos.'; errEl.style.display = 'block'; return; }
+      const btn = document.getElementById('loginBtn');
+      btn.textContent = 'Entrando…'; btn.disabled = true;
+      const res = await apiFetch('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+      btn.textContent = 'Entrar'; btn.disabled = false;
+      if (res.ok && res.data?.session) {
+        const { session, user } = res.data;
+        localStorage.setItem('atlas_token', session.access_token);
+        if (session.refresh_token) localStorage.setItem('atlas_refresh', session.refresh_token);
+        localStorage.setItem('atlas_user', JSON.stringify(user));
+        _token = session.access_token;
+        showLauncher(user);
+      } else {
+        errEl.textContent = res.data?.error || 'Credenciais inválidas.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    async function register() {
+      const name = document.getElementById('authName').value.trim();
+      const email = document.getElementById('authRegEmail').value.trim();
+      const password = document.getElementById('authRegPassword').value;
+      const errEl = document.getElementById('registerError');
+      const sucEl = document.getElementById('registerSuccess');
+      errEl.style.display = 'none'; sucEl.style.display = 'none';
+      if (!email || !password) { errEl.textContent = 'E-mail e senha são obrigatórios.'; errEl.style.display = 'block'; return; }
+      if (password.length < 6) { errEl.textContent = 'Senha deve ter mínimo 6 caracteres.'; errEl.style.display = 'block'; return; }
+      const btn = document.getElementById('registerBtn');
+      btn.textContent = 'Criando…'; btn.disabled = true;
+      const res = await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify({ email, password, name }) });
+      btn.textContent = 'Criar conta'; btn.disabled = false;
+      if (res.ok) {
+        if (res.data?.session) {
+          const { session, user } = res.data;
+          localStorage.setItem('atlas_token', session.access_token);
+          if (session.refresh_token) localStorage.setItem('atlas_refresh', session.refresh_token);
+          localStorage.setItem('atlas_user', JSON.stringify(user));
+          _token = session.access_token;
+          showLauncher(user);
+        } else {
+          sucEl.textContent = 'Conta criada! Verifique seu e-mail para confirmar.';
+          sucEl.style.display = 'block';
+        }
+      } else {
+        errEl.textContent = res.data?.error || 'Erro ao criar conta.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    async function forgotPassword() {
+      const email = prompt('Digite seu e-mail para recuperar a senha:');
+      if (!email) return;
+      const res = await apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+      alert(res.ok ? 'E-mail de recuperação enviado!' : (res.data?.error || 'Erro ao enviar e-mail.'));
+    }
+
+    async function logout() {
+      if (!confirm('Deseja sair?')) return;
+      await apiFetch('/auth/logout', { method: 'POST' }).catch(() => {});
+      localStorage.removeItem('atlas_token');
+      localStorage.removeItem('atlas_refresh');
+      localStorage.removeItem('atlas_user');
+      _token = null;
+      location.reload();
+    }
+
+    function showLogin() {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('registerForm').style.display = 'none';
+      document.querySelectorAll('.auth-tab')[0].classList.add('active');
+      document.querySelectorAll('.auth-tab')[1].classList.remove('active');
+    }
+
+    function showRegister() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'block';
+      document.querySelectorAll('.auth-tab')[0].classList.remove('active');
+      document.querySelectorAll('.auth-tab')[1].classList.add('active');
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('hub_theme', isDark ? 'light' : 'dark');
+    }
+
+    function applyTheme() {
+      const t = localStorage.getItem('hub_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    }
+
+    init();
+  </script>
+</body>
+</html>

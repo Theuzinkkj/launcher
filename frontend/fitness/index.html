@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="theme-color" content="#10b981"/>
+  <title>FitHub — Fitness Pessoal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/fitness.css"/>
+</head>
+<body>
+
+<div id="loadingScreen" class="loading-screen">
+  <div class="loading-logo">
+    <svg viewBox="0 0 48 48" fill="none">
+      <path d="M18 8h1a4 4 0 0 1 0 8h-1" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      <line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <p>Carregando FitHub…</p>
+</div>
+
+<div id="app" class="app hidden">
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg class="logo-icon" viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 14h1a3 3 0 0 1 0 6h-1M4 14h7v5a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">FitHub</span>
+      </div>
+      <button class="sidebar-toggle-btn" onclick="FitnessApp.toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <span class="nav-label">Principal</span>
+        <a class="nav-item active" data-section="dashboard" href="#dashboard">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-section="fitbot" href="#fitbot">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          <span>FitBot IA</span>
+          <span class="nav-badge-fit">IA</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <span class="nav-label">Treino</span>
+        <a class="nav-item" data-section="workouts" href="#workouts">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          <span>Treinos</span>
+        </a>
+        <a class="nav-item" data-section="progress" href="#progress">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+          <span>Progresso</span>
+        </a>
+      </div>
+      <div class="nav-section">
+        <span class="nav-label">Nutrição</span>
+        <a class="nav-item" data-section="nutrition" href="#nutrition">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a9 9 0 0 1 9 9c0 3-4 7-9 11C7 18 3 14 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
+          <span>Alimentação</span>
+        </a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-footer-btn" onclick="FitnessApp.toggleTheme()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+        <span>Tema</span>
+      </button>
+      <a class="sidebar-footer-btn" href="javascript:FitnessApp.navigate('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </a>
+      <a class="sidebar-footer-btn" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        <span>Início</span>
+      </a>
+    </div>
+  </aside>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="topbar-menu-btn" onclick="FitnessApp.toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 class="topbar-title" id="topbarTitle">Dashboard</h1>
+    </div>
+    <div class="topbar-right">
+      <span id="userNameDisplay" class="topbar-user"></span>
+      <div id="streakBadge" class="streak-badge hidden"><span>🔥</span><span id="streakCount">0</span></div>
+    </div>
+  </div>
+
+  <main class="main" id="mainContent">
+    <section id="sec-dashboard" class="section active">
+      <div class="section-header">
+        <div><h2 id="dashGreeting">Bom dia! 💪</h2><p class="text-muted" id="dashDate"></p></div>
+      </div>
+      <div id="dashboardContent"></div>
+    </section>
+
+    <section id="sec-workouts" class="section hidden">
+      <div class="section-header">
+        <div><h2>Meus Treinos</h2><p class="text-muted">Crie e gerencie seus planos</p></div>
+        <button class="btn btn-fit" onclick="Workouts.openAdd()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Treino
+        </button>
+      </div>
+      <div id="workoutsContent"></div>
+    </section>
+
+    <section id="sec-nutrition" class="section hidden">
+      <div class="section-header">
+        <div><h2>Alimentação</h2><p class="text-muted">Registre suas refeições</p></div>
+        <div class="section-actions">
+          <input type="date" id="nutritionDate" class="form-input" style="width:auto" onchange="Nutrition.render()"/>
+          <button class="btn btn-fit" onclick="Nutrition.openAddMeal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Adicionar Refeição
+          </button>
+        </div>
+      </div>
+      <div id="nutritionContent"></div>
+    </section>
+
+    <section id="sec-progress" class="section hidden">
+      <div class="section-header">
+        <div><h2>Progresso</h2><p class="text-muted">Evolução e medidas corporais</p></div>
+        <button class="btn btn-fit" onclick="Progress.openAddMeasurement()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Registrar Medida
+        </button>
+      </div>
+      <div id="progressContent"></div>
+    </section>
+
+    <section id="sec-fitbot" class="section hidden">
+      <div class="section-header">
+        <div><h2>FitBot</h2><div id="fitbotModeBadge" style="margin-top:.25rem"></div></div>
+        <button class="btn btn-ghost btn-sm" onclick="FitBot.clear()">Limpar conversa</button>
+      </div>
+      <div class="assistant-container">
+        <div class="assistant-chat" id="fitbotChat">
+          <div class="assistant-message bot">
+            <div class="bot-avatar fit">💪</div>
+            <div class="message-bubble">
+              <p>Olá! Sou o <strong>FitBot</strong>, seu personal trainer virtual com IA.</p>
+              <p style="margin-top:.5rem">Posso ajudar com treinos personalizados, nutrição, cálculo de macros e dicas de performance. Experimente:</p>
+              <ul style="margin-top:.5rem;padding-left:1rem">
+                <li>• "Monte um treino ABC para hipertrofia"</li>
+                <li>• "Calcule meus macros para emagrecer"</li>
+                <li>• "Dicas para ganhar massa muscular"</li>
+                <li>• "Como melhorar minha recuperação?"</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="assistant-input-area">
+          <div class="assistant-suggestions" id="fitbotSuggestions">
+            <button class="suggestion-chip fit" onclick="FitBot.query('Monte um treino ABC para hipertrofia')">Treino ABC hipertrofia</button>
+            <button class="suggestion-chip fit" onclick="FitBot.query('Calcule meus macros para emagrecimento')">Calcular macros</button>
+            <button class="suggestion-chip fit" onclick="FitBot.query('Dicas de recuperação muscular')">Recuperação</button>
+            <button class="suggestion-chip fit" onclick="FitBot.query('Quais suplementos são recomendados?')">Suplementação</button>
+          </div>
+          <div class="assistant-input-wrap">
+            <input type="text" id="fitbotInput" class="assistant-input" placeholder="Pergunte ao seu personal trainer virtual…" onkeydown="if(event.key==='Enter')FitBot.send()"/>
+            <button class="btn btn-fit" onclick="FitBot.send()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9 22,2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec-profile" class="section hidden">
+      <div class="section-header">
+        <div><h2>Meu Perfil</h2><p class="text-muted">Configurações e metas pessoais</p></div>
+      </div>
+      <div id="profileContent"></div>
+    </section>
+  </main>
+</div>
+
+<div id="modalOverlay" class="modal-overlay hidden" onclick="FitnessApp.closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" onclick="FitnessApp.closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="js/fitness-app.js"></script>
+<script src="js/modules/dashboard.js"></script>
+<script src="js/modules/workouts.js"></script>
+<script src="js/modules/nutrition.js"></script>
+<script src="js/modules/progress.js"></script>
+<script src="js/modules/fitbot.js"></script>
+<script src="js/modules/profile.js"></script>
+</body>
+</html>

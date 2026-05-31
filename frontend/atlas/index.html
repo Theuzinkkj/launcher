@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#6366f1"/>
+  <title>Atlas — Hub de Produtividade</title>
+  <link rel="manifest" href="/atlas/manifest.json"/>
+  <link rel="apple-touch-icon" href="/atlas/icons/icon.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/atlas/css/app.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════ LOADING ═══════════════════════ -->
+<div id="loadingScreen" class="loading-screen">
+  <div class="loading-logo">
+    <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="36" cy="36" r="36" fill="rgba(255,255,255,0.1)"/>
+      <polygon points="36,12 58,54 14,54" fill="white"/>
+      <circle cx="36" cy="30" r="9" fill="#6366f1"/>
+    </svg>
+  </div>
+  <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+  <p>Carregando Atlas…</p>
+</div>
+
+<!-- ═══════════════════════ AUTH SCREEN ═══════════════════════ -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="28" fill="#6366f1"/>
+        <polygon points="28,10 48,46 8,46" fill="white"/>
+        <circle cx="28" cy="26" r="7" fill="#6366f1"/>
+      </svg>
+      <h1>Atlas</h1>
+      <p>Hub de Produtividade Pessoal</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="Auth.showLogin()">Entrar</button>
+      <button class="auth-tab" onclick="Auth.showRegister()">Criar conta</button>
+    </div>
+    <div id="loginForm">
+      <div id="loginError" class="auth-error"></div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="authEmail" placeholder="seu@email.com" autocomplete="email"/></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="authPassword" placeholder="Sua senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')Auth.login()"/></div>
+      <button class="btn btn-atlas w-full" onclick="Auth.login()" id="loginBtn">Entrar</button>
+      <div class="auth-footer"><button class="btn-link" onclick="Auth.forgotPassword()">Esqueci minha senha</button></div>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div id="registerError" class="auth-error"></div>
+      <div id="registerSuccess" class="auth-success"></div>
+      <div class="form-group"><label>Nome (opcional)</label><input type="text" id="authName" placeholder="Seu nome"/></div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="authRegEmail" placeholder="seu@email.com" autocomplete="email"/></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="authRegPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password" onkeydown="if(event.key==='Enter')Auth.register()"/></div>
+      <button class="btn btn-atlas w-full" onclick="Auth.register()" id="registerBtn">Criar conta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ VAULT UNLOCK ═══════════════════════ -->
+<div id="vaultUnlockScreen" class="vault-unlock-screen hidden">
+  <div class="vault-unlock-card">
+    <div class="vault-icon">🔐</div>
+    <h2>Cofre de Senhas</h2>
+
+    <!-- Setup form (first time) -->
+    <div id="vaultSetupForm">
+      <p class="vault-subtitle">Configure uma senha mestra para proteger seu cofre.</p>
+      <div class="form-group"><label>Senha mestra</label><input type="password" id="vaultSetupPassword" placeholder="Crie uma senha forte"/></div>
+      <div class="form-group"><label>Confirmar senha</label><input type="password" id="vaultSetupConfirm" placeholder="Repita a senha" onkeydown="if(event.key==='Enter')setupVault()"/></div>
+      <div id="vaultSetupError" class="auth-error"></div>
+      <button class="btn btn-atlas w-full" onclick="setupVault()">Configurar cofre</button>
+      <button class="btn-link" style="margin-top:12px;display:block;text-align:center" onclick="AtlasApp.skipVault()">Pular por agora</button>
+    </div>
+
+    <!-- Unlock form (has master hash) -->
+    <div id="vaultUnlockForm" style="display:none">
+      <p class="vault-subtitle">Digite sua senha mestra para acessar o cofre.</p>
+      <div class="form-group"><label>Senha mestra</label><input type="password" id="vaultUnlockPassword" placeholder="Sua senha mestra" onkeydown="if(event.key==='Enter')unlockVault()"/></div>
+      <div id="vaultUnlockError" class="auth-error"></div>
+      <button class="btn btn-atlas w-full" onclick="unlockVault()">Desbloquear</button>
+      <button class="btn-link" style="margin-top:12px;display:block;text-align:center" onclick="AtlasApp.skipVault()">Continuar sem cofre</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ APP ═══════════════════════ -->
+<div id="app" class="app hidden">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#6366f1"/><polygon points="16,6 26,24 6,24" fill="white"/><circle cx="16" cy="14" r="4" fill="#6366f1"/></svg>
+        <span>Atlas</span>
+      </div>
+      <button class="sidebar-toggle" onclick="AtlasApp.toggleSidebar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <a class="nav-item" data-section="dashboard" onclick="AtlasApp.navigate('dashboard')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-section="assistant" onclick="AtlasApp.navigate('assistant')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <span>Assistente</span>
+        <span class="nav-badge">IA</span>
+      </a>
+
+      <div class="nav-section-label">Organização</div>
+      <a class="nav-item" data-section="vault" onclick="AtlasApp.navigate('vault')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>Cofre</span>
+      </a>
+      <a class="nav-item" data-section="notes" onclick="AtlasApp.navigate('notes')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Notas</span>
+        <span class="nav-badge" id="navNotesCount" style="display:none"></span>
+      </a>
+      <a class="nav-item" data-section="todos" onclick="AtlasApp.navigate('todos')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Tarefas</span>
+        <span class="nav-badge" id="navTodosCount" style="display:none"></span>
+      </a>
+      <a class="nav-item" data-section="goals" onclick="AtlasApp.navigate('goals')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <span>Metas</span>
+      </a>
+      <a class="nav-item" data-section="calendar" onclick="AtlasApp.navigate('calendar')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Agenda</span>
+      </a>
+
+      <div class="nav-section-label">Pessoal</div>
+      <a class="nav-item" data-section="diary" onclick="AtlasApp.navigate('diary')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Diário</span>
+      </a>
+      <a class="nav-item" data-section="study" onclick="AtlasApp.navigate('study')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        <span>Estudos</span>
+      </a>
+
+      <div class="nav-section-label">Recursos</div>
+      <a class="nav-item" data-section="links" onclick="AtlasApp.navigate('links')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span>Links</span>
+      </a>
+      <a class="nav-item" data-section="library" onclick="AtlasApp.navigate('library')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>Biblioteca</span>
+      </a>
+      <a class="nav-item" data-section="files" onclick="AtlasApp.navigate('files')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span>Arquivos</span>
+      </a>
+
+      <div class="nav-section-label">Ferramentas</div>
+      <a class="nav-item" data-section="tools" onclick="AtlasApp.navigate('tools')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span>Ferramentas</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-footer-btn" onclick="AtlasApp.toggleTheme()" title="Alternar tema">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <span>Tema</span>
+      </button>
+      <button class="sidebar-footer-btn" onclick="AtlasApp.openSettings()" title="Configurações">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Config</span>
+      </button>
+      <button class="sidebar-footer-btn" onclick="AtlasApp.exportData()" title="Backup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+        <span>Backup</span>
+      </button>
+      <a href="/" class="sidebar-footer-btn" title="Início">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Início</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="topbar-menu-btn" onclick="AtlasApp.toggleSidebar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <h1 class="topbar-title" id="topbarTitle">Dashboard</h1>
+    <div class="topbar-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="globalSearch" placeholder="Buscar em tudo… (Ctrl+K)" oninput="AtlasApp.performSearch(this.value)" onfocus="document.getElementById('searchResults').style.display='block'" autocomplete="off"/>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="AtlasApp.toggleFocusMode()" title="Modo foco (Ctrl+F)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <button class="topbar-btn" onclick="AtlasApp.showShortcuts()" title="Atalhos (?)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h12"/></svg>
+      </button>
+      <span class="user-name" id="userDisplayName"></span>
+      <button class="topbar-btn topbar-logout" onclick="Auth.logout()" title="Sair">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <section id="sec-dashboard" class="section">
+      <div class="section-header">
+        <div>
+          <h2 id="dashGreeting">Olá!</h2>
+          <p id="dashDate" class="text-muted"></p>
+        </div>
+        <div id="dashClock" class="dash-clock"></div>
+      </div>
+      <div class="widgets-grid" id="dashWidgets">
+        <div class="widget" id="widget-events">
+          <div class="widget-header"><span class="widget-icon">📅</span><span class="widget-title">Eventos hoje</span></div>
+          <div class="widget-body" id="widgetEvents"><p class="empty-hint">Nenhum evento hoje</p></div>
+        </div>
+        <div class="widget" id="widget-todos">
+          <div class="widget-header"><span class="widget-icon">✅</span><span class="widget-title">Tarefas pendentes</span><span class="widget-badge" id="widgetTodosCount"></span></div>
+          <div class="widget-body" id="widgetTodos"><p class="empty-hint">Nenhuma tarefa</p></div>
+        </div>
+        <div class="widget" id="widget-goals">
+          <div class="widget-header"><span class="widget-icon">🎯</span><span class="widget-title">Metas ativas</span></div>
+          <div class="widget-body" id="widgetGoals"><p class="empty-hint">Nenhuma meta ativa</p></div>
+        </div>
+        <div class="widget" id="widget-study">
+          <div class="widget-header"><span class="widget-icon">📚</span><span class="widget-title">Estudos</span></div>
+          <div class="widget-body" id="widgetStudy"><p class="empty-hint">Nenhuma matéria</p></div>
+        </div>
+        <div class="widget" id="widget-activity">
+          <div class="widget-header"><span class="widget-icon">⚡</span><span class="widget-title">Atividade recente</span></div>
+          <div class="widget-body" id="widgetActivity"><p class="empty-hint">Nenhuma atividade</p></div>
+        </div>
+        <div class="widget widget-quick">
+          <div class="widget-header"><span class="widget-icon">🚀</span><span class="widget-title">Ações rápidas</span></div>
+          <div class="quick-actions">
+            <button class="quick-btn" onclick="AtlasApp.navigate('notes');setTimeout(()=>Notes.openAdd(),100)">+ Nota</button>
+            <button class="quick-btn" onclick="AtlasApp.navigate('todos');setTimeout(()=>Todos.openAdd(),100)">+ Tarefa</button>
+            <button class="quick-btn" onclick="AtlasApp.navigate('calendar');setTimeout(()=>Calendar.openAdd(),100)">+ Evento</button>
+            <button class="quick-btn" onclick="AtlasApp.navigate('assistant')">Assistente</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VAULT -->
+    <section id="sec-vault" class="section hidden">
+      <div class="section-header">
+        <div><h2>Cofre de Senhas</h2><p class="text-muted" id="vaultSubtitle">0 entradas</p></div>
+        <button class="btn btn-atlas" onclick="Vault.openAdd()">+ Nova Senha</button>
+      </div>
+      <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="vaultSearch" placeholder="Buscar no cofre…" oninput="Vault.render()"/></div>
+      <div id="vaultGrid" class="items-grid"></div>
+      <div id="vaultEmpty" class="empty-state hidden"><div class="empty-icon">🔐</div><h3>Cofre vazio</h3><p>Adicione suas senhas para mantê-las seguras.</p></div>
+      <div id="vaultLocked" class="empty-state hidden"><div class="empty-icon">🔒</div><h3>Cofre bloqueado</h3><p>Desbloqueie o cofre para ver suas senhas.</p></div>
+    </section>
+
+    <!-- NOTES -->
+    <section id="sec-notes" class="section hidden">
+      <div class="section-header">
+        <div><h2>Notas</h2><p class="text-muted" id="notesSubtitle">0 notas</p></div>
+        <button class="btn btn-atlas" onclick="Notes.openAdd()">+ Nova Nota</button>
+      </div>
+      <div class="filter-bar">
+        <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="notesSearch" placeholder="Buscar notas…" oninput="Notes.render()"/></div>
+        <select id="notesCategoryFilter" class="filter-select" onchange="Notes.render()"><option value="">Todas as categorias</option></select>
+      </div>
+      <div id="notesPinned" class="notes-pinned-section hidden"><h3 class="subsection-label">📌 Fixadas</h3><div id="notesPinnedGrid" class="items-grid"></div></div>
+      <div id="notesGrid" class="items-grid"></div>
+      <div id="notesEmpty" class="empty-state hidden"><div class="empty-icon">📝</div><h3>Nenhuma nota</h3><p>Crie sua primeira nota para começar.</p></div>
+    </section>
+
+    <!-- TODOS -->
+    <section id="sec-todos" class="section hidden">
+      <div class="section-header">
+        <div><h2>Tarefas</h2><p class="text-muted" id="todosSubtitle"></p></div>
+        <button class="btn btn-atlas" onclick="Todos.openAdd()">+ Nova Tarefa</button>
+      </div>
+      <div class="filter-bar">
+        <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="todosSearch" placeholder="Buscar tarefas…" oninput="Todos.render()"/></div>
+        <select id="todosFilter" class="filter-select" onchange="Todos.render()"><option value="all">Todas</option><option value="pending">Pendentes</option><option value="done">Concluídas</option><option value="high">Alta prioridade</option></select>
+      </div>
+      <div id="todosStats" class="stats-row"></div>
+      <div id="todosList" class="todos-list"></div>
+      <div id="todosEmpty" class="empty-state hidden"><div class="empty-icon">✅</div><h3>Nenhuma tarefa</h3><p>Adicione tarefas para organizar seu dia.</p></div>
+    </section>
+
+    <!-- GOALS -->
+    <section id="sec-goals" class="section hidden">
+      <div class="section-header">
+        <div><h2>Metas</h2><p class="text-muted" id="goalsSubtitle"></p></div>
+        <button class="btn btn-atlas" onclick="Goals.openAdd()">+ Nova Meta</button>
+      </div>
+      <div class="filter-bar">
+        <select id="goalsFilter" class="filter-select" onchange="Goals.render()"><option value="all">Todas</option><option value="active">Ativas</option><option value="done">Concluídas</option></select>
+      </div>
+      <div id="goalsGrid" class="items-grid"></div>
+      <div id="goalsEmpty" class="empty-state hidden"><div class="empty-icon">🎯</div><h3>Nenhuma meta</h3><p>Defina metas para alcançar seus objetivos.</p></div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="sec-calendar" class="section hidden">
+      <div class="section-header">
+        <div><h2>Agenda</h2><p class="text-muted" id="calendarSubtitle"></p></div>
+        <div class="btn-group">
+          <button class="btn btn-outline" id="calViewMonth" onclick="Calendar.setView('month')">Mês</button>
+          <button class="btn btn-outline" id="calViewWeek" onclick="Calendar.setView('week')">Semana</button>
+          <button class="btn btn-outline" id="calViewDay" onclick="Calendar.setView('day')">Dia</button>
+          <button class="btn btn-atlas" onclick="Calendar.openAdd()">+ Evento</button>
+        </div>
+      </div>
+      <div class="calendar-nav">
+        <button class="btn btn-icon-only" onclick="Calendar.prev()">‹</button>
+        <h3 id="calendarNavTitle"></h3>
+        <button class="btn btn-icon-only" onclick="Calendar.next()">›</button>
+        <button class="btn btn-outline btn-sm" onclick="Calendar.goToday()">Hoje</button>
+      </div>
+      <div id="calendarView"></div>
+    </section>
+
+    <!-- DIARY -->
+    <section id="sec-diary" class="section hidden">
+      <div class="section-header">
+        <div><h2>Diário</h2><p class="text-muted" id="diarySubtitle"></p></div>
+        <button class="btn btn-atlas" onclick="Diary.openAdd()">+ Nova Entrada</button>
+      </div>
+      <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="diarySearch" placeholder="Buscar no diário…" oninput="Diary.render()"/></div>
+      <div class="diary-layout">
+        <div id="diaryList" class="diary-list"></div>
+        <div id="diaryEditor" class="diary-editor hidden"></div>
+      </div>
+      <div id="diaryEmpty" class="empty-state hidden"><div class="empty-icon">📖</div><h3>Diário vazio</h3><p>Registre seus pensamentos e reflexões.</p></div>
+    </section>
+
+    <!-- STUDY -->
+    <section id="sec-study" class="section hidden">
+      <div class="section-header">
+        <div><h2>Estudos</h2><p class="text-muted" id="studySubtitle"></p></div>
+        <div class="btn-group">
+          <button class="btn btn-outline" onclick="Study.startPomodoro()">🍅 Pomodoro</button>
+          <button class="btn btn-atlas" onclick="Study.openAddSubject()">+ Nova Matéria</button>
+        </div>
+      </div>
+      <div id="studyStats" class="stats-row"></div>
+      <div id="studyGrid" class="items-grid"></div>
+      <div id="studyEmpty" class="empty-state hidden"><div class="empty-icon">📚</div><h3>Nenhuma matéria</h3><p>Adicione matérias para organizar seus estudos.</p></div>
+    </section>
+
+    <!-- LINKS -->
+    <section id="sec-links" class="section hidden">
+      <div class="section-header">
+        <div><h2>Links</h2><p class="text-muted" id="linksSubtitle"></p></div>
+        <button class="btn btn-atlas" onclick="Links.openAdd()">+ Novo Link</button>
+      </div>
+      <div class="filter-bar">
+        <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="linksSearch" placeholder="Buscar links…" oninput="Links.render()"/></div>
+        <select id="linksCategoryFilter" class="filter-select" onchange="Links.render()"><option value="">Todas as categorias</option></select>
+      </div>
+      <div id="linksFavorites" class="links-favorites-section hidden"><h3 class="subsection-label">⭐ Favoritos</h3><div id="linksFavoritesGrid" class="items-grid"></div></div>
+      <div id="linksGrid" class="items-grid"></div>
+      <div id="linksEmpty" class="empty-state hidden"><div class="empty-icon">🔗</div><h3>Nenhum link</h3><p>Salve links importantes para acessar rapidamente.</p></div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="sec-library" class="section hidden">
+      <div class="section-header">
+        <div><h2>Biblioteca</h2><p class="text-muted" id="librarySubtitle"></p></div>
+        <button class="btn btn-atlas" onclick="Library.openAdd()">+ Adicionar Item</button>
+      </div>
+      <div class="filter-bar">
+        <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="librarySearch" placeholder="Buscar na biblioteca…" oninput="Library.render()"/></div>
+        <select id="libraryTypeFilter" class="filter-select" onchange="Library.render()"><option value="">Todos os tipos</option><option value="book">Livros</option><option value="movie">Filmes</option><option value="series">Séries</option><option value="podcast">Podcasts</option><option value="course">Cursos</option><option value="other">Outros</option></select>
+      </div>
+      <div class="library-tabs" id="libraryTabs">
+        <button class="lib-tab active" data-status="" onclick="Library.setTab(this,'')">Todos</button>
+        <button class="lib-tab" data-status="in_progress" onclick="Library.setTab(this,'in_progress')">Em andamento</button>
+        <button class="lib-tab" data-status="to_consume" onclick="Library.setTab(this,'to_consume')">Para consumir</button>
+        <button class="lib-tab" data-status="done" onclick="Library.setTab(this,'done')">Concluídos</button>
+      </div>
+      <div id="libraryGrid" class="items-grid"></div>
+    </section>
+
+    <!-- FILES -->
+    <section id="sec-files" class="section hidden">
+      <div class="section-header">
+        <div><h2>Arquivos</h2><p class="text-muted" id="filesSubtitle"></p></div>
+        <div class="btn-group">
+          <button class="btn btn-outline" onclick="Files.newFolder()">+ Pasta</button>
+          <button class="btn btn-atlas" onclick="document.getElementById('fileInput').click()">⬆ Upload</button>
+          <input type="file" id="fileInput" multiple style="display:none" onchange="Files.handleUpload(this.files)"/>
+        </div>
+      </div>
+      <div class="search-bar" style="margin-bottom:12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="filesSearch" placeholder="Buscar arquivos…" oninput="Files.render()"/></div>
+      <div id="filesBreadcrumb" class="breadcrumb"></div>
+      <div id="filesDropZone" class="drop-zone" ondragover="Files.onDragOver(event)" ondrop="Files.onDrop(event)" ondragleave="Files.onDragLeave(event)">
+        <p>Arraste arquivos aqui ou clique em Upload</p>
+      </div>
+      <div id="filesGrid" class="items-grid files-grid"></div>
+    </section>
+
+    <!-- TOOLS -->
+    <section id="sec-tools" class="section hidden">
+      <div class="section-header"><h2>Ferramentas</h2></div>
+      <div class="tools-tabs">
+        <button class="tool-tab active" onclick="Tools.setTab(this,'password')">🔑 Gerador de Senhas</button>
+        <button class="tool-tab" onclick="Tools.setTab(this,'pomodoro')">🍅 Pomodoro</button>
+        <button class="tool-tab" onclick="Tools.setTab(this,'converters')">🔄 Conversores</button>
+        <button class="tool-tab" onclick="Tools.setTab(this,'qrcode')">📱 QR Code</button>
+      </div>
+      <div id="toolContent" class="tool-content"></div>
+    </section>
+
+    <!-- ASSISTANT -->
+    <section id="sec-assistant" class="section hidden">
+      <div class="section-header">
+        <div><h2>Atlas Assistant</h2><span id="aiModeBadge" class="ai-badge">Verificando…</span></div>
+        <button class="btn btn-outline" onclick="Assistant.clear()">Limpar</button>
+      </div>
+      <div class="assistant-container">
+        <div id="assistantChat" class="assistant-chat">
+          <div class="ai-message">
+            <span class="ai-avatar">🤖</span>
+            <div class="ai-bubble">Olá! Sou o Atlas Assistant. Posso ajudar com suas notas, tarefas, metas e muito mais. Como posso ajudar?</div>
+          </div>
+        </div>
+        <div class="assistant-suggestions" id="assistantSuggestions">
+          <button class="suggestion-btn" onclick="Assistant.query('Quantas tarefas tenho pendentes?')">Tarefas pendentes</button>
+          <button class="suggestion-btn" onclick="Assistant.query('Mostre minhas metas ativas')">Metas ativas</button>
+          <button class="suggestion-btn" onclick="Assistant.query('O que tenho na agenda hoje?')">Agenda de hoje</button>
+          <button class="suggestion-btn" onclick="Assistant.query('Resumo geral do meu progresso')">Resumo geral</button>
+        </div>
+        <div class="assistant-input-row">
+          <input type="text" id="assistantInput" placeholder="Pergunte qualquer coisa…" onkeydown="if(event.key==='Enter')Assistant.send()"/>
+          <button class="btn btn-atlas" onclick="Assistant.send()">Enviar</button>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /main -->
+</div><!-- /app -->
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- SEARCH RESULTS -->
+<div id="searchOverlay" class="search-overlay hidden" onclick="AtlasApp.closeSearch()"></div>
+<div id="searchResults" class="search-results hidden">
+  <div class="search-results-header">
+    <span>Resultados</span>
+    <button onclick="AtlasApp.closeSearch()">✕</button>
+  </div>
+  <div id="searchResultsList"></div>
+</div>
+
+<!-- MODAL -->
+<div id="modalOverlay" class="modal-overlay hidden" onclick="AtlasApp.closeModal(event)">
+  <div class="modal" id="mainModal">
+    <div class="modal-header">
+      <h3 id="modalTitle"></h3>
+      <button class="modal-close" onclick="AtlasApp.closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- SHORTCUTS MODAL -->
+<div id="shortcutsModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header"><h3>Atalhos de Teclado</h3><button class="modal-close" onclick="document.getElementById('shortcutsModal').classList.add('hidden')">✕</button></div>
+    <div class="modal-body">
+      <div class="shortcuts-grid">
+        <div class="shortcut-item"><kbd>Ctrl+K</kbd><span>Busca global</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+B</kbd><span>Toggle sidebar</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+T</kbd><span>Alternar tema</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+F</kbd><span>Modo foco</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+D</kbd><span>Dashboard</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+N</kbd><span>Nova nota</span></div>
+        <div class="shortcut-item"><kbd>Esc</kbd><span>Fechar modal</span></div>
+        <div class="shortcut-item"><kbd>?</kbd><span>Mostrar atalhos</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal-overlay hidden" onclick="if(event.target===this)this.classList.add('hidden')">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><h3>Configurações</h3><button class="modal-close" onclick="document.getElementById('settingsModal').classList.add('hidden')">✕</button></div>
+    <div class="modal-body">
+      <div class="settings-section">
+        <h4>Aparência</h4>
+        <div class="settings-row">
+          <span>Tema escuro</span>
+          <label class="toggle"><input type="checkbox" id="settingsTheme" onchange="AtlasApp.setTheme(this.checked?'dark':'light')"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>Notificações</h4>
+        <div class="settings-row">
+          <span>Ativar notificações</span>
+          <label class="toggle"><input type="checkbox" id="settingsNotifications" onchange="AtlasApp.toggleNotifications(this.checked)"/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h4>Dados</h4>
+        <div class="settings-actions">
+          <button class="btn btn-outline" onclick="AtlasApp.exportData()">Exportar backup</button>
+          <label class="btn btn-outline">Importar backup<input type="file" accept=".json" style="display:none" onchange="AtlasApp.importData(event)"/></label>
+          <button class="btn btn-danger" onclick="AtlasApp.confirmClearAll()">Apagar tudo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE PREVIEW MODAL -->
+<div id="imagePreviewModal" class="modal-overlay hidden" onclick="this.classList.add('hidden')">
+  <div class="image-preview-container">
+    <img id="imagePreviewImg" src="" alt="Preview"/>
+    <button class="image-preview-close" onclick="document.getElementById('imagePreviewModal').classList.add('hidden')">✕</button>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="/atlas/js/storage.js"></script>
+<script src="/atlas/js/crypto.js"></script>
+<script src="/atlas/js/api.js"></script>
+<script src="/atlas/js/auth.js"></script>
+<script src="/atlas/js/modules/dashboard.js"></script>
+<script src="/atlas/js/modules/vault.js"></script>
+<script src="/atlas/js/modules/notes.js"></script>
+<script src="/atlas/js/modules/todos.js"></script>
+<script src="/atlas/js/modules/goals.js"></script>
+<script src="/atlas/js/modules/calendar.js"></script>
+<script src="/atlas/js/modules/diary.js"></script>
+<script src="/atlas/js/modules/study.js"></script>
+<script src="/atlas/js/modules/links.js"></script>
+<script src="/atlas/js/modules/library.js"></script>
+<script src="/atlas/js/modules/files.js"></script>
+<script src="/atlas/js/modules/tools.js"></script>
+<script src="/atlas/js/modules/assistant.js"></script>
+<script src="/atlas/js/app.js"></script>
+<script>
+  // Vault unlock helpers
+  function setupVault() {
+    const pw = document.getElementById('vaultSetupPassword').value;
+    const pw2 = document.getElementById('vaultSetupConfirm').value;
+    const err = document.getElementById('vaultSetupError');
+    if (!pw || pw.length < 4) { err.textContent='Senha muito curta.'; err.style.display='block'; return; }
+    if (pw !== pw2) { err.textContent='Senhas não conferem.'; err.style.display='block'; return; }
+    CryptoManager.hashPassword(pw).then(({hash,salt}) => {
+      Storage.set('vault.masterHash', hash);
+      Storage.set('vault.salt', salt);
+      Storage.set('vault._unlocked', true);
+      AtlasApp.launchApp();
+    });
+  }
+  function unlockVault() {
+    const pw = document.getElementById('vaultUnlockPassword').value;
+    const err = document.getElementById('vaultUnlockError');
+    const hash = Storage.get('vault.masterHash');
+    const salt = Storage.get('vault.salt');
+    if (!hash || !salt) { AtlasApp.launchApp(); return; }
+    CryptoManager.verifyPassword(pw, hash, salt).then(ok => {
+      if (ok) { Storage.set('vault._unlocked', true); AtlasApp.launchApp(); }
+      else { err.textContent='Senha incorreta.'; err.style.display='block'; }
+    });
+  }
+</script>
+</body>
+</html>

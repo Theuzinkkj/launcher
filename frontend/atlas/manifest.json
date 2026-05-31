@@ -1,0 +1,21 @@
+{
+  "name": "Atlas — Hub de Produtividade",
+  "short_name": "Atlas",
+  "description": "Hub pessoal de produtividade com IA, notas, tarefas, metas e mais.",
+  "start_url": "/atlas",
+  "id": "/atlas",
+  "display": "standalone",
+  "background_color": "#6366f1",
+  "theme_color": "#6366f1",
+  "orientation": "any",
+  "lang": "pt-BR",
+  "scope": "/atlas/",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Dashboard", "url": "/atlas#dashboard" },
+    { "name": "Tarefas",   "url": "/atlas#todos" },
+    { "name": "Assistant", "url": "/atlas#assistant" }
+  ]
+}
