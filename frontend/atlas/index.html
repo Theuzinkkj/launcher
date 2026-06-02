@@ -60,6 +60,15 @@
       <div class="form-group"><label>Senha</label><input type="password" id="authRegPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password" onkeydown="if(event.key==='Enter')Auth.register()"/></div>
       <button class="btn btn-atlas w-full" onclick="Auth.register()" id="registerBtn">Criar conta</button>
     </div>
+    <div id="forgotPasswordForm" style="display:none">
+      <h2 class="auth-panel-title">Recuperar senha</h2>
+      <p class="auth-panel-copy">Informe o e-mail da sua conta para receber um link seguro de redefinicao de senha.</p>
+      <div id="forgotPasswordError" class="auth-error"></div>
+      <div id="forgotPasswordSuccess" class="auth-success"></div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="forgotPasswordEmail" placeholder="seu@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')Auth.sendPasswordReset()"/></div>
+      <button class="btn btn-atlas w-full" onclick="Auth.sendPasswordReset()" id="forgotPasswordBtn">Enviar link de redefinicao</button>
+      <div class="auth-footer"><button class="btn-link" onclick="Auth.showLogin()">Voltar para entrar</button></div>
+    </div>
     <div id="resetPasswordForm" style="display:none">
       <div id="resetPasswordError" class="auth-error"></div>
       <div id="resetPasswordSuccess" class="auth-success"></div>

@@ -217,6 +217,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 [data-theme="dark"] .auth-success { background: rgba(22,101,52,.22); color: #86efac; }
 
+.auth-panel-title {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  text-align: left;
+}
+
+.auth-panel-copy {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin: 0 0 18px;
+  text-align: left;
+}
+
 .vault-subtitle {
   color: var(--text-muted);
   font-size: 14px;

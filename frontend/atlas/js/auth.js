@@ -43,6 +43,7 @@ const Auth = (() => {
     document.getElementById('authScreen').classList.add('visible');
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'none';
     document.getElementById('resetPasswordForm').style.display = 'block';
     document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
 
@@ -170,12 +171,45 @@ const Auth = (() => {
     location.reload();
   }
 
-  async function forgotPassword() {
+  function forgotPassword() {
     const currentEmail = document.getElementById('authEmail')?.value.trim() || '';
-    const email = prompt('Digite seu e-mail para recuperar a senha:', currentEmail);
-    if (!email || !email.trim()) return;
-    const res = await API.auth.forgotPassword(email.trim());
-    AtlasApp.toast(res.ok ? 'E-mail de recuperacao enviado!' : (res.data?.error || 'Erro ao enviar.'), res.ok ? 'success' : 'error');
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('resetPasswordForm').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'block';
+    document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+
+    const emailEl = document.getElementById('forgotPasswordEmail');
+    const errEl = document.getElementById('forgotPasswordError');
+    const sucEl = document.getElementById('forgotPasswordSuccess');
+    if (emailEl) {
+      emailEl.value = currentEmail;
+      setTimeout(() => emailEl.focus(), 0);
+    }
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+  }
+
+  async function sendPasswordReset() {
+    const email = document.getElementById('forgotPasswordEmail').value.trim();
+    const errEl = document.getElementById('forgotPasswordError');
+    const sucEl = document.getElementById('forgotPasswordSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+    if (!email) { errEl.textContent = 'Informe seu e-mail.'; errEl.style.display = 'block'; return; }
+
+    const btn = document.getElementById('forgotPasswordBtn');
+    btn.textContent = 'Enviando...'; btn.disabled = true;
+    const res = await API.auth.forgotPassword(email);
+    btn.textContent = 'Enviar link de redefinicao'; btn.disabled = false;
+
+    if (res.ok) {
+      sucEl.textContent = 'Enviamos um link de redefinicao para seu e-mail.';
+      sucEl.style.display = 'block';
+    } else {
+      errEl.textContent = res.data?.error || 'Nao foi possivel enviar o e-mail.';
+      errEl.style.display = 'block';
+    }
   }
 
   function toLocal(item) {
@@ -227,6 +261,7 @@ const Auth = (() => {
   function showLogin() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('forgotPasswordForm').style.display = 'none';
     document.getElementById('resetPasswordForm').style.display = 'none';
     document.querySelectorAll('.auth-tab')[0].classList.add('active');
     document.querySelectorAll('.auth-tab')[1].classList.remove('active');
@@ -235,10 +270,11 @@ const Auth = (() => {
   function showRegister() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('forgotPasswordForm').style.display = 'none';
     document.getElementById('resetPasswordForm').style.display = 'none';
     document.querySelectorAll('.auth-tab')[0].classList.remove('active');
     document.querySelectorAll('.auth-tab')[1].classList.add('active');
   }
 
-  return { getToken, getUser, isLoggedIn, checkSession, saveSession, clearSession, login, register, logout, forgotPassword, resetPassword, isResetPasswordUrl, showResetPassword, loadAllData, showLogin, showRegister, toLocal };
+  return { getToken, getUser, isLoggedIn, checkSession, saveSession, clearSession, login, register, logout, forgotPassword, sendPasswordReset, resetPassword, isResetPasswordUrl, showResetPassword, loadAllData, showLogin, showRegister, toLocal };
 })();
