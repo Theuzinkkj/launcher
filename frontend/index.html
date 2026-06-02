@@ -77,6 +77,8 @@
     .auth-success { background: #dcfce7; color: #15803d; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
     [data-theme="dark"] .auth-error { background: rgba(185,28,28,.2); color: #fca5a5; }
     [data-theme="dark"] .auth-success { background: rgba(21,128,61,.2); color: #86efac; }
+    .auth-panel-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+    .auth-panel-copy { color: var(--text-muted); font-size: 13.5px; line-height: 1.5; margin-bottom: 18px; }
 
     /* Launcher */
     #launcherScreen { display: none; min-height: 100vh; flex-direction: column; }
@@ -211,6 +213,22 @@
           <input type="password" id="authRegPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password" onkeydown="if(event.key==='Enter')register()"/>
         </div>
         <button class="btn btn-primary" onclick="register()" id="registerBtn">Criar conta</button>
+      </div>
+
+      <!-- Forgot password form -->
+      <div id="forgotPasswordForm" style="display:none">
+        <h2 class="auth-panel-title">Recuperar senha</h2>
+        <p class="auth-panel-copy">Informe o e-mail da sua conta para receber um link seguro de redefinicao de senha.</p>
+        <div id="forgotPasswordError" class="auth-error"></div>
+        <div id="forgotPasswordSuccess" class="auth-success"></div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="forgotPasswordEmail" placeholder="seu@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')sendPasswordReset()"/>
+        </div>
+        <button class="btn btn-primary" onclick="sendPasswordReset()" id="forgotPasswordBtn">Enviar link de redefinicao</button>
+        <div class="auth-footer">
+          <button class="btn-link" onclick="showLogin()">Voltar para entrar</button>
+        </div>
       </div>
     </div>
   </div>
@@ -368,11 +386,42 @@
       }
     }
 
-    async function forgotPassword() {
-      const email = prompt('Digite seu e-mail para recuperar a senha:');
-      if (!email) return;
+    function forgotPassword() {
+      const currentEmail = document.getElementById('authEmail').value.trim();
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('forgotPasswordForm').style.display = 'block';
+      document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+
+      const emailEl = document.getElementById('forgotPasswordEmail');
+      document.getElementById('forgotPasswordError').style.display = 'none';
+      document.getElementById('forgotPasswordSuccess').style.display = 'none';
+      emailEl.value = currentEmail;
+      setTimeout(() => emailEl.focus(), 0);
+    }
+
+    async function sendPasswordReset() {
+      const email = document.getElementById('forgotPasswordEmail').value.trim();
+      const errEl = document.getElementById('forgotPasswordError');
+      const sucEl = document.getElementById('forgotPasswordSuccess');
+      errEl.style.display = 'none';
+      sucEl.style.display = 'none';
+      if (!email) { errEl.textContent = 'Informe seu e-mail.'; errEl.style.display = 'block'; return; }
+
+      const btn = document.getElementById('forgotPasswordBtn');
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
       const res = await apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
-      alert(res.ok ? 'E-mail de recuperação enviado!' : (res.data?.error || 'Erro ao enviar e-mail.'));
+      btn.textContent = 'Enviar link de redefinicao';
+      btn.disabled = false;
+
+      if (res.ok) {
+        sucEl.textContent = 'Enviamos um link de redefinicao para seu e-mail.';
+        sucEl.style.display = 'block';
+      } else {
+        errEl.textContent = res.data?.error || 'Erro ao enviar e-mail.';
+        errEl.style.display = 'block';
+      }
     }
 
     async function logout() {
@@ -388,6 +437,7 @@
     function showLogin() {
       document.getElementById('loginForm').style.display = 'block';
       document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('forgotPasswordForm').style.display = 'none';
       document.querySelectorAll('.auth-tab')[0].classList.add('active');
       document.querySelectorAll('.auth-tab')[1].classList.remove('active');
     }
@@ -395,6 +445,7 @@
     function showRegister() {
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('registerForm').style.display = 'block';
+      document.getElementById('forgotPasswordForm').style.display = 'none';
       document.querySelectorAll('.auth-tab')[0].classList.remove('active');
       document.querySelectorAll('.auth-tab')[1].classList.add('active');
     }
