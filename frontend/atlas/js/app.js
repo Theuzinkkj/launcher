@@ -21,6 +21,11 @@ const AtlasApp = (() => {
 
   // ── Init ─────────────────────────────────────────────────────────────────────
   async function init() {
+    if (Auth.isResetPasswordUrl()) {
+      Auth.showResetPassword();
+      return;
+    }
+
     const loggedIn = await Auth.checkSession();
     if (!loggedIn) {
       document.getElementById('loadingScreen').style.display = 'none';

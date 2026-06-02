@@ -60,6 +60,14 @@
       <div class="form-group"><label>Senha</label><input type="password" id="authRegPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password" onkeydown="if(event.key==='Enter')Auth.register()"/></div>
       <button class="btn btn-atlas w-full" onclick="Auth.register()" id="registerBtn">Criar conta</button>
     </div>
+    <div id="resetPasswordForm" style="display:none">
+      <div id="resetPasswordError" class="auth-error"></div>
+      <div id="resetPasswordSuccess" class="auth-success"></div>
+      <div class="form-group"><label>Nova senha</label><input type="password" id="resetPassword" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/></div>
+      <div class="form-group"><label>Confirmar nova senha</label><input type="password" id="resetPasswordConfirm" placeholder="Repita a nova senha" autocomplete="new-password" onkeydown="if(event.key==='Enter')Auth.resetPassword()"/></div>
+      <button class="btn btn-atlas w-full" onclick="Auth.resetPassword()" id="resetPasswordBtn">Alterar senha</button>
+      <div class="auth-footer"><button class="btn-link" onclick="Auth.showLogin()">Voltar para entrar</button></div>
+    </div>
   </div>
 </div>
 

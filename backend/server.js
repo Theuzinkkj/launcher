@@ -30,6 +30,7 @@ app.use('/api',         apiRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 app.get('/',          (req, res) => res.sendFile(path.join(FRONTEND, 'index.html')));
+app.get('/reset-password', (req, res) => res.sendFile(path.join(FRONTEND, 'atlas', 'index.html')));
 app.get('/atlas',     (req, res) => res.sendFile(path.join(FRONTEND, 'atlas', 'index.html')));
 app.get('/atlas/*',   (req, res) => res.sendFile(path.join(FRONTEND, 'atlas', 'index.html')));
 app.get('/fitness',   (req, res) => res.sendFile(path.join(FRONTEND, 'fitness', 'index.html')));

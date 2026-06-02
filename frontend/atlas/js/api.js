@@ -78,6 +78,7 @@ const API = (() => {
     me: () => get('/auth/me'),
     refresh: (refresh_token) => post('/auth/refresh', { refresh_token }),
     forgotPassword: (email) => post('/auth/forgot-password', { email }),
+    resetPassword: (access_token, refresh_token, password) => post('/auth/reset-password', { access_token, refresh_token, password }),
   };
 
   // ── Resources ─────────────────────────────────────────────────────────────────

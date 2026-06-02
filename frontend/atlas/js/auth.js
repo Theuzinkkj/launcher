@@ -24,6 +24,69 @@ const Auth = (() => {
     API.clearToken();
   }
 
+  function getRecoverySession() {
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const queryParams = new URLSearchParams(window.location.search);
+    return {
+      accessToken: hashParams.get('access_token') || queryParams.get('access_token') || '',
+      refreshToken: hashParams.get('refresh_token') || queryParams.get('refresh_token') || ''
+    };
+  }
+
+  function isResetPasswordUrl() {
+    return window.location.pathname.includes('/reset-password') || !!getRecoverySession().accessToken;
+  }
+
+  function showResetPassword() {
+    const session = getRecoverySession();
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('authScreen').classList.add('visible');
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('resetPasswordForm').style.display = 'block';
+    document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+
+    const errEl = document.getElementById('resetPasswordError');
+    const sucEl = document.getElementById('resetPasswordSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+    if (!session.accessToken || !session.refreshToken) {
+      errEl.textContent = 'Link de recuperacao invalido ou expirado. Solicite um novo e-mail.';
+      errEl.style.display = 'block';
+    }
+    return true;
+  }
+
+  async function resetPassword() {
+    const session = getRecoverySession();
+    const password = document.getElementById('resetPassword').value;
+    const confirm = document.getElementById('resetPasswordConfirm').value;
+    const errEl = document.getElementById('resetPasswordError');
+    const sucEl = document.getElementById('resetPasswordSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
+    if (!session.accessToken || !session.refreshToken) { errEl.textContent = 'Link de recuperacao invalido ou expirado.'; errEl.style.display = 'block'; return; }
+    if (!password || password.length < 6) { errEl.textContent = 'A nova senha deve ter pelo menos 6 caracteres.'; errEl.style.display = 'block'; return; }
+    if (password !== confirm) { errEl.textContent = 'As senhas nao conferem.'; errEl.style.display = 'block'; return; }
+
+    const btn = document.getElementById('resetPasswordBtn');
+    btn.textContent = 'Alterando...'; btn.disabled = true;
+    const res = await API.auth.resetPassword(session.accessToken, session.refreshToken, password);
+    btn.textContent = 'Alterar senha'; btn.disabled = false;
+
+    if (res.ok) {
+      clearSession();
+      sucEl.textContent = 'Senha alterada com sucesso. Entre usando a nova senha.';
+      sucEl.style.display = 'block';
+      history.replaceState(null, '', '/atlas');
+      setTimeout(showLogin, 1800);
+    } else {
+      errEl.textContent = res.data?.error || 'Nao foi possivel alterar a senha.';
+      errEl.style.display = 'block';
+    }
+  }
+
   async function checkSession() {
     const token = getToken();
     if (!token) return false;
@@ -108,10 +171,11 @@ const Auth = (() => {
   }
 
   async function forgotPassword() {
-    const email = prompt('Digite seu e-mail para recuperar a senha:');
-    if (!email) return;
-    const res = await API.auth.forgotPassword(email);
-    AtlasApp.toast(res.ok ? 'E-mail de recuperação enviado!' : (res.data?.error || 'Erro ao enviar.'), res.ok ? 'success' : 'error');
+    const currentEmail = document.getElementById('authEmail')?.value.trim() || '';
+    const email = prompt('Digite seu e-mail para recuperar a senha:', currentEmail);
+    if (!email || !email.trim()) return;
+    const res = await API.auth.forgotPassword(email.trim());
+    AtlasApp.toast(res.ok ? 'E-mail de recuperacao enviado!' : (res.data?.error || 'Erro ao enviar.'), res.ok ? 'success' : 'error');
   }
 
   function toLocal(item) {
@@ -163,6 +227,7 @@ const Auth = (() => {
   function showLogin() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('resetPasswordForm').style.display = 'none';
     document.querySelectorAll('.auth-tab')[0].classList.add('active');
     document.querySelectorAll('.auth-tab')[1].classList.remove('active');
   }
@@ -170,9 +235,10 @@ const Auth = (() => {
   function showRegister() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('resetPasswordForm').style.display = 'none';
     document.querySelectorAll('.auth-tab')[0].classList.remove('active');
     document.querySelectorAll('.auth-tab')[1].classList.add('active');
   }
 
-  return { getToken, getUser, isLoggedIn, checkSession, saveSession, clearSession, login, register, logout, forgotPassword, loadAllData, showLogin, showRegister, toLocal };
+  return { getToken, getUser, isLoggedIn, checkSession, saveSession, clearSession, login, register, logout, forgotPassword, resetPassword, isResetPasswordUrl, showResetPassword, loadAllData, showLogin, showRegister, toLocal };
 })();
