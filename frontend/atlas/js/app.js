@@ -109,9 +109,15 @@ const AtlasApp = (() => {
     location.hash = section;
 
     // Toggle sections
-    document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+    document.querySelectorAll('.section').forEach(s => {
+      s.classList.add('hidden');
+      s.classList.remove('active');
+    });
     const target = document.getElementById('sec-' + section);
-    if (target) target.classList.remove('hidden');
+    if (target) {
+      target.classList.remove('hidden');
+      target.classList.add('active');
+    }
 
     // Update nav active
     document.querySelectorAll('.nav-item').forEach(a => {

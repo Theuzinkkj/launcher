@@ -101,6 +101,10 @@ ul, ol { list-style: none; }
 
 img { max-width: 100%; display: block; }
 
+svg {
+  flex-shrink: 0;
+}
+
 button { cursor: pointer; font-family: inherit; }
 
 input, textarea, select {
@@ -452,6 +456,13 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
 }
 
+.sidebar-logo > svg {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: block;
+}
+
 .sidebar-logo-icon {
   width: 32px;
   height: 32px;
@@ -502,6 +513,22 @@ h1, h2, h3, h4, h5, h6 {
   transition: background var(--transition), color var(--transition);
   user-select: none;
   position: relative;
+}
+
+.nav-item > svg,
+.sidebar-footer-btn > svg,
+.topbar-btn > svg,
+.topbar-menu-btn > svg,
+.topbar-search > svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.nav-item > svg {
+  width: 18px;
+  height: 18px;
+  flex-basis: 18px;
 }
 
 .nav-item:hover {
@@ -598,6 +625,64 @@ h1, h2, h3, h4, h5, h6 {
   gap: 12px;
   z-index: 100;
   transition: left var(--transition-md);
+}
+
+.topbar-menu-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), color var(--transition);
+}
+
+.topbar-menu-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.topbar-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.topbar-search {
+  width: min(360px, 36vw);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text-muted);
+}
+
+.topbar-search input {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.user-name {
+  max-width: 160px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .topbar-left {
@@ -720,6 +805,13 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 24px;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+.dash-clock {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .section-title-group { flex: 1; }
@@ -994,7 +1086,8 @@ textarea.form-input {
 /* ============================================================
    14. WIDGETS (Dashboard)
    ============================================================ */
-.dashboard-grid {
+.dashboard-grid,
+.widgets-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
@@ -1020,8 +1113,20 @@ textarea.form-input {
 .widget-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   margin-bottom: 14px;
+}
+
+.widget-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
 }
 
 .widget-title {
@@ -1040,6 +1145,57 @@ textarea.form-input {
 }
 
 .widget-link:hover { text-decoration: underline; }
+
+.widget-body {
+  min-height: 80px;
+}
+
+.widget-badge {
+  margin-left: auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.widget-badge:empty {
+  display: none;
+}
+
+.empty-hint {
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 12px 0;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quick-btn {
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.quick-btn:hover {
+  background: var(--primary-bg);
+  border-color: var(--primary-light);
+  color: var(--primary-dark);
+}
 
 .widget-list-empty {
   text-align: center;
@@ -3172,7 +3328,8 @@ kbd {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .dashboard-grid {
+  .dashboard-grid,
+  .widgets-grid {
     grid-template-columns: 1fr;
   }
 
@@ -3212,7 +3369,7 @@ kbd {
     padding: 0;
   }
 
-  .topbar-center { display: none; }
+  .topbar-search { display: none; }
 
   .search-results-panel { left: -20px; right: -20px; }
 

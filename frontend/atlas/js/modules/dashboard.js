@@ -66,7 +66,7 @@ const Dashboard = (() => {
 
   /* ---- render events ---- */
   function renderEvents() {
-    const container = el('dashEvents');
+    const container = el('widgetEvents');
     if (!container) return;
     const today = todayStr();
     const events = (Storage.get('events') || []).filter(e => e.date === today);
@@ -87,8 +87,8 @@ const Dashboard = (() => {
 
   /* ---- render todos ---- */
   function renderTodos() {
-    const container = el('dashTodos');
-    const countEl   = el('dashTodosCount');
+    const container = el('widgetTodos');
+    const countEl   = el('widgetTodosCount');
     if (!container) return;
     const todos   = Storage.get('todos') || [];
     const pending = todos.filter(t => !t.done);
@@ -114,7 +114,7 @@ const Dashboard = (() => {
 
   /* ---- render goals ---- */
   function renderGoals() {
-    const container = el('dashGoals');
+    const container = el('widgetGoals');
     if (!container) return;
     const goals = (Storage.get('goals') || []).filter(g => !g.completed);
     if (!goals.length) {
@@ -139,7 +139,7 @@ const Dashboard = (() => {
 
   /* ---- render study ---- */
   function renderStudy() {
-    const container  = el('dashStudy');
+    const container  = el('widgetStudy');
     const hoursEl    = el('dashStudyHours');
     if (!container) return;
     const sessions = Storage.get('study.sessions') || [];
@@ -169,7 +169,7 @@ const Dashboard = (() => {
 
   /* ---- render mood ---- */
   function renderMood() {
-    const container = el('dashMood');
+    const container = el('widgetMood');
     if (!container) return;
     const diary = Storage.get('diary') || [];
     const days  = [];
@@ -188,7 +188,7 @@ const Dashboard = (() => {
 
   /* ---- render activity ---- */
   function renderActivity() {
-    const container = el('dashActivity');
+    const container = el('widgetActivity');
     if (!container) return;
     const activity = Storage.get('activity') || [];
     if (!activity.length) {
