@@ -20,7 +20,10 @@ const Habits = (() => {
 
   async function syncFromCloud() {
     const res = await FitnessAPI.get('/habits');
-    if (!res.ok) return;
+    if (!res.ok) {
+      FitnessApp.toast(`Sync de habitos falhou: ${res.error || 'rota indisponivel'}`, 'warning');
+      return;
+    }
     const remote = (res.data || []).map(fromApi);
     if (remote.length) {
       const localOnly = _items.filter(local => !remote.some(r => r.id === local.id || r.name.toLowerCase() === local.name.toLowerCase()));

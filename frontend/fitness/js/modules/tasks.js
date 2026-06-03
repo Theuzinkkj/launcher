@@ -17,7 +17,10 @@ const FitTasks = (() => {
 
   async function syncFromCloud() {
     const res = await FitnessAPI.get('/tasks');
-    if (!res.ok) return;
+    if (!res.ok) {
+      FitnessApp.toast(`Sync de tarefas falhou: ${res.error || 'rota indisponivel'}`, 'warning');
+      return;
+    }
     const remote = (res.data || []).map(fromApi);
     if (remote.length) {
       const localOnly = _items.filter(local => !remote.some(r => r.id === local.id || (r.title.toLowerCase() === local.title.toLowerCase() && r.due === local.due)));

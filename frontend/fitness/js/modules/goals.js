@@ -14,7 +14,10 @@ const FitGoals = (() => {
 
   async function syncFromCloud() {
     const res = await FitnessAPI.get('/goals-fit');
-    if (!res.ok) return;
+    if (!res.ok) {
+      FitnessApp.toast(`Sync de metas falhou: ${res.error || 'rota indisponivel'}`, 'warning');
+      return;
+    }
     const remote = (res.data || []).map(fromApi);
     if (remote.length) {
       const localOnly = _items.filter(local => !remote.some(r => r.id === local.id || r.title.toLowerCase() === local.title.toLowerCase()));
