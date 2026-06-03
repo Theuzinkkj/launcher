@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/atlas/css/app.css?v=2.1.10"/>
+  <link rel="stylesheet" href="/atlas/css/app.css?v=2.1.11"/>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
@@ -120,8 +120,8 @@
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#6366f1"/><polygon points="16,6 26,24 6,24" fill="white"/><circle cx="16" cy="14" r="4" fill="#6366f1"/></svg>
         <span>Atlas</span>
       </div>
-      <button class="sidebar-toggle" onclick="AtlasApp.toggleSidebar()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <button class="sidebar-toggle" onclick="AtlasApp.openSettings()" title="Configuracoes" aria-label="Configuracoes">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.31.22.65.22 1h.38a2 2 0 0 1 0 4h-.09c-.36 0-.7.08-1.01.23z"/></svg>
       </button>
     </div>
     <nav class="sidebar-nav">
@@ -563,24 +563,24 @@
 </div>
 
 <!-- SCRIPTS -->
-<script src="/atlas/js/storage.js?v=2.1.10"></script>
-<script src="/atlas/js/crypto.js?v=2.1.10"></script>
-<script src="/atlas/js/api.js?v=2.1.10"></script>
-<script src="/atlas/js/auth.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/dashboard.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/vault.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/notes.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/todos.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/goals.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/calendar.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/diary.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/study.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/links.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/library.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/files.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/tools.js?v=2.1.10"></script>
-<script src="/atlas/js/modules/assistant.js?v=2.1.10"></script>
-<script src="/atlas/js/app.js?v=2.1.10"></script>
+<script src="/atlas/js/storage.js?v=2.1.11"></script>
+<script src="/atlas/js/crypto.js?v=2.1.11"></script>
+<script src="/atlas/js/api.js?v=2.1.11"></script>
+<script src="/atlas/js/auth.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/dashboard.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/vault.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/notes.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/todos.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/goals.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/calendar.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/diary.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/study.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/links.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/library.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/files.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/tools.js?v=2.1.11"></script>
+<script src="/atlas/js/modules/assistant.js?v=2.1.11"></script>
+<script src="/atlas/js/app.js?v=2.1.11"></script>
 <script>
   // Vault unlock helpers
   function withVaultTimeout(promise, label) {

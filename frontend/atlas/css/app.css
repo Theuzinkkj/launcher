@@ -666,7 +666,7 @@ h1, h2, h3, h4, h5, h6 {
   border: none;
   background: transparent;
   color: var(--text-muted);
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   transition: background var(--transition), color var(--transition);
@@ -3943,6 +3943,10 @@ kbd {
 
   .topbar {
     left: 0 !important;
+  }
+
+  .topbar-menu-btn {
+    display: flex;
   }
 
   .main {
