@@ -29,19 +29,31 @@ const Goals = (() => {
     return 'red';
   }
 
+  const filters = [
+    { id: 'all', label: 'Todas', icon: '✨' },
+    { id: 'active', label: 'Ativas', icon: '🔥' },
+    { id: 'done', label: 'Concluidas', icon: '✅' },
+    { id: 'short', label: 'Curto prazo', icon: '⚡' },
+    { id: 'medium', label: 'Medio prazo', icon: '📍' },
+    { id: 'long', label: 'Longo prazo', icon: '🏁' }
+  ];
+
   const timelineLabels = { short: 'Curto prazo', medium: 'Médio prazo', long: 'Longo prazo' };
 
   /* ---- render ---- */
   function render() {
-    let goals = Storage.get('goals') || [];
+    const allGoals = Storage.get('goals') || [];
+    let goals = [...allGoals];
 
-    if (currentFilter !== 'all') {
-      goals = goals.filter(g => g.timeline === currentFilter);
-    }
+    if (currentFilter === 'active') goals = goals.filter(g => !g.completed && (g.progress || 0) < 100);
+    else if (currentFilter === 'done') goals = goals.filter(g => g.completed || (g.progress || 0) >= 100);
+    else if (currentFilter !== 'all') goals = goals.filter(g => g.timeline === currentFilter);
 
     const grid  = document.getElementById('goalsGrid');
     const empty = document.getElementById('goalsEmpty');
     if (!grid) return;
+    renderFilters();
+    renderOverview(allGoals);
 
     if (!goals.length) {
       grid.innerHTML = '';
@@ -61,7 +73,13 @@ const Goals = (() => {
       return `
         <div class="goal-card ${completed ? 'completed' : soon ? 'deadline-soon' : ''}" data-id="${g.id}">
           <div class="goal-header">
-            <div class="goal-title">${escHtml(g.title)}</div>
+            <div class="goal-title-wrap">
+              <div class="goal-icon">${completed ? '✅' : soon ? '⏳' : '🎯'}</div>
+              <div>
+                <div class="goal-title">${escHtml(g.title)}</div>
+                <div class="goal-status">${completed ? 'Concluida' : overdue ? 'Atrasada' : soon ? `${days}d restantes` : 'Em andamento'}</div>
+              </div>
+            </div>
             <span class="goal-timeline">${timelineLabels[g.timeline] || g.timeline}</span>
           </div>
           ${g.description ? `<div class="goal-description">${escHtml(g.description)}</div>` : ''}
@@ -95,10 +113,41 @@ const Goals = (() => {
   /* ---- filter ---- */
   function setFilter(filter) {
     currentFilter = filter;
-    document.querySelectorAll('#goalsFilterBar .filter-btn').forEach(b => {
+    document.querySelectorAll('#goalsFilterBar .goal-filter-chip').forEach(b => {
       b.classList.toggle('active', b.dataset.filter === filter);
     });
     render();
+  }
+
+  function renderFilters() {
+    const bar = document.getElementById('goalsFilterBar');
+    if (!bar) return;
+    bar.innerHTML = filters.map(f => `
+      <button type="button" class="goal-filter-chip ${currentFilter === f.id ? 'active' : ''}" data-filter="${f.id}" onclick="Goals.setFilter('${f.id}')">
+        <span>${f.icon}</span>${f.label}
+      </button>
+    `).join('');
+  }
+
+  function renderOverview(goals) {
+    const wrap = document.getElementById('goalsOverview');
+    const sub = document.getElementById('goalsSubtitle');
+    if (!wrap) return;
+    const total = goals.length;
+    const done = goals.filter(g => g.completed || (g.progress || 0) >= 100).length;
+    const active = total - done;
+    const avg = total ? Math.round(goals.reduce((sum, g) => sum + Math.min(100, Math.max(0, g.progress || 0)), 0) / total) : 0;
+    const overdue = goals.filter(g => {
+      const d = daysUntil(g.deadline);
+      return d !== null && d < 0 && !(g.completed || (g.progress || 0) >= 100);
+    }).length;
+    if (sub) sub.textContent = `${total} ${total === 1 ? 'meta' : 'metas'} cadastradas`;
+    wrap.innerHTML = `
+      <div class="goal-stat"><span>${active}</span><small>ativas</small></div>
+      <div class="goal-stat"><span>${done}</span><small>concluidas</small></div>
+      <div class="goal-stat"><span>${avg}%</span><small>media</small></div>
+      <div class="goal-stat ${overdue ? 'danger' : ''}"><span>${overdue}</span><small>atrasadas</small></div>
+    `;
   }
 
   /* ---- add / edit ---- */
@@ -252,9 +301,7 @@ const Goals = (() => {
   function setupFilters() {
     const bar = document.getElementById('goalsFilterBar');
     if (!bar) return;
-    bar.querySelectorAll('.filter-btn').forEach(b => {
-      b.addEventListener('click', () => setFilter(b.dataset.filter));
-    });
+    renderFilters();
   }
 
   function init() {
