@@ -446,14 +446,21 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar::-webkit-scrollbar-track { background: transparent; }
 .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
 /* Logo */
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
+  min-width: 0;
 }
 
 .sidebar-logo > svg {
@@ -481,6 +488,31 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.5px;
+}
+
+.sidebar-toggle {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.sidebar-toggle:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--text-light);
+}
+
+.sidebar-toggle svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* Nav */
