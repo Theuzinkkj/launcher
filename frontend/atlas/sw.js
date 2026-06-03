@@ -1,5 +1,5 @@
 /* ===== ATLAS SERVICE WORKER ===== */
-const CACHE_VERSION = 'atlas-v2.1.0';
+const CACHE_VERSION = 'atlas-v2.1.1';
 const CORE_ASSETS = [
   '/atlas', '/atlas/', '/atlas/index.html',
   '/atlas/css/app.css',
@@ -40,8 +40,12 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  e.respondWith(caches.open(CACHE_VERSION).then(c => c.match(request).then(cached => {
-    const net = fetch(request).then(res => { if (res?.status === 200) c.put(request, res.clone()); return res; }).catch(() => null);
-    return cached || net || new Response('Offline', { status: 503 });
-  })));
+  e.respondWith(caches.open(CACHE_VERSION).then(c => {
+    return fetch(request)
+      .then(res => {
+        if (res?.status === 200) c.put(request, res.clone());
+        return res;
+      })
+      .catch(() => c.match(request).then(cached => cached || new Response('Offline', { status: 503 })));
+  }));
 });
