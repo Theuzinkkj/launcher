@@ -242,5 +242,5 @@ const Study = (() => {
   /* ---- public API ---- */
   function init() {}
 
-  return { init, render, openAddSubject, startSession, openPomodoro, deleteSubject, _pickColor };
+  return { init, render, openAddSubject, startSession, openPomodoro, startPomodoro: openPomodoro, deleteSubject, _pickColor };
 })();
