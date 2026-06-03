@@ -1161,6 +1161,54 @@ textarea.form-input {
   color: var(--text-light);
 }
 
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-bar .search-bar {
+  flex: 1 1 320px;
+  margin-bottom: 0;
+}
+
+.filter-select {
+  min-width: 180px;
+  height: 42px;
+  padding: 0 38px 0 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 18px,
+    calc(100% - 12px) 18px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.filter-select:hover {
+  border-color: var(--primary-light);
+  background-color: var(--input-bg);
+}
+
+.filter-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+}
+
 /* ============================================================
    13. CARDS
    ============================================================ */
@@ -3818,6 +3866,16 @@ kbd {
 
   .section {
     padding: 20px 16px 32px;
+  }
+
+  .filter-bar {
+    align-items: stretch;
+  }
+
+  .filter-bar .search-bar,
+  .filter-select {
+    width: 100%;
+    flex-basis: 100%;
   }
 
   .todos-stats,
