@@ -622,7 +622,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   padding: 0 20px;
-  gap: 12px;
+  gap: 14px;
   z-index: 100;
   transition: left var(--transition-md);
 }
@@ -651,10 +651,14 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text);
   letter-spacing: 0;
   white-space: nowrap;
+  line-height: 1;
+  margin: 0;
 }
 
 .topbar-search {
-  width: min(360px, 36vw);
+  flex: 1 1 360px;
+  max-width: 460px;
+  min-width: 220px;
   height: 36px;
   display: flex;
   align-items: center;
@@ -662,17 +666,32 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--input-bg);
+  background: var(--surface);
   color: var(--text-muted);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.topbar-search:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+  background: var(--input-bg);
 }
 
 .topbar-search input {
   width: 100%;
   min-width: 0;
+  height: 100%;
+  padding: 0;
   border: none;
   outline: none;
   background: transparent;
   color: var(--text);
+  font-size: 13.5px;
+  line-height: 1;
+}
+
+.topbar-search input::placeholder {
+  color: var(--text-light);
 }
 
 .user-name {
@@ -705,18 +724,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .topbar-right {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .topbar-btn {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-sm);
   background: none;
-  border: none;
+  border: 1px solid transparent;
   color: var(--text-muted);
   font-size: 18px;
   display: flex;
@@ -729,6 +749,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .topbar-btn:hover {
   background: var(--surface-2);
+  border-color: var(--border);
   color: var(--text);
 }
 
@@ -1070,6 +1091,42 @@ textarea.form-input {
 .input-group-btn:hover {
   background: var(--border);
   color: var(--text);
+}
+
+.search-bar {
+  width: 100%;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  margin-bottom: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.search-bar:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+  background: var(--input-bg);
+}
+
+.search-bar input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13.5px;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-light);
 }
 
 /* ============================================================
@@ -3040,11 +3097,19 @@ textarea.form-input {
   pointer-events: none;
 }
 
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.18);
+  z-index: 250;
+}
+
+.search-results,
 .search-results-panel {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
+  position: fixed;
+  top: calc(var(--topbar-h) + 10px);
+  left: calc(var(--sidebar-w) + 20px);
+  width: min(520px, calc(100vw - var(--sidebar-w) - 40px));
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -3052,10 +3117,38 @@ textarea.form-input {
   z-index: 500;
   max-height: 360px;
   overflow-y: auto;
-  display: none;
 }
 
 .search-results-panel.open { display: block; }
+
+.search-results-header {
+  height: 42px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.search-results-header button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-results-header button:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
 
 .search-result-item {
   display: flex;
@@ -3083,9 +3176,29 @@ textarea.form-input {
   margin-top: 2px;
 }
 
+.search-result-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  font-size: 14px;
+}
+
 .search-result-content { flex: 1; min-width: 0; }
 .search-result-title   { font-size: 13.5px; font-weight: 500; color: var(--text); }
-.search-result-detail  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.search-result-detail,
+.search-result-sub  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.search-empty {
+  padding: 22px 16px;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 13px;
+}
 
 /* ============================================================
    30. BADGES
@@ -3371,7 +3484,12 @@ kbd {
 
   .topbar-search { display: none; }
 
-  .search-results-panel { left: -20px; right: -20px; }
+  .search-results,
+  .search-results-panel {
+    top: calc(var(--topbar-h) + 8px);
+    left: 12px;
+    width: calc(100vw - 24px);
+  }
 
   .mobile-overlay {
     position: fixed;

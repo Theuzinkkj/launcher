@@ -215,9 +215,14 @@ const AtlasApp = (() => {
   function performSearch(q) {
     const panel = document.getElementById('searchResults');
     const list = document.getElementById('searchResultsList');
-    if (!q || q.length < 2) { panel.classList.add('hidden'); return; }
+    const overlay = document.getElementById('searchOverlay');
+    if (!q || q.length < 2) {
+      panel.classList.add('hidden');
+      overlay.classList.add('hidden');
+      return;
+    }
     panel.classList.remove('hidden');
-    document.getElementById('searchOverlay').classList.remove('hidden');
+    overlay.classList.remove('hidden');
     const ql = q.toLowerCase();
     const results = [];
 
