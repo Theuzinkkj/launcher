@@ -5,7 +5,10 @@ const Profile = (() => {
   const DAYS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
   const RESTRICTIONS = ['Lactose','Glúten','Vegano','Vegetariano','Sem açúcar','Sem frutos do mar','Sem nozes','Low carb'];
 
-  async function init() { await load(); }
+  async function init() {
+    await load();
+    if (!document.getElementById('sec-profile')?.classList.contains('hidden')) render();
+  }
 
   async function load() {
     const r = await FitnessAPI.get('/profile');
@@ -119,7 +122,7 @@ const Profile = (() => {
   }
 
   function logout() {
-    if (!confirm('Deseja sair do FitHub?')) return;
+    if (!confirm('Deseja sair do AtlasFit?')) return;
     localStorage.removeItem('atlas_token');
     sessionStorage.clear();
     window.location.href = '/';

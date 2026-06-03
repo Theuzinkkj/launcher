@@ -25,14 +25,15 @@ const Nutrition = (() => {
     meals.forEach(m => { if (grouped[m.meal_type]) grouped[m.meal_type].push(m); });
 
     el.innerHTML = `
-      <div class="fit-card" style="margin-bottom:1rem">
+      <div class="fit-card diet-summary" style="margin-bottom:1rem">
         <div style="font-size:.9375rem;font-weight:600;margin-bottom:.875rem">📊 Resumo do Dia</div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;text-align:center">
           ${macro('🔥','Calorias',Math.round(sum.calories),'kcal','#f97316')}
           ${macro('🥩','Proteína',Math.round(sum.protein),'g','#ef4444')}
           ${macro('🌾','Carbs',Math.round(sum.carbs),'g','#f59e0b')}
-          ${macro('🥑','Gordura',Math.round(sum.fat),'g','#10b981')}
+          ${macro('🥑','Gordura',Math.round(sum.fat),'g','#FFD600')}
         </div>
+        <div class="deficit-bar"><span>Deficit calorico</span><strong>${Math.round(2000 - (sum.calories || 0))} kcal</strong></div>
       </div>
       ${MEAL_ORDER.map(type => {
         const items = grouped[type];

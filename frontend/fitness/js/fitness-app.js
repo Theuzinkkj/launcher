@@ -1,4 +1,4 @@
-/* ===== FITHUB APP SHELL ===== */
+/* ===== ATLASFIT APP SHELL ===== */
 
 const TOKEN_KEY = 'atlas_token';
 const USER_KEY  = 'atlas_user';
@@ -19,7 +19,7 @@ const FitnessAPI = (() => {
       const data = await res.json().catch(() => ({}));
       return { ok: res.ok, data, error: data.error };
     } catch {
-      return { ok: false, error: 'Sem conexão' };
+      return { ok: false, error: 'Sem conexao' };
     }
   }
 
@@ -33,11 +33,15 @@ const FitnessAPI = (() => {
 })();
 
 const FitnessApp = (() => {
-  let _current = 'dashboard';
+  let _current = 'habits';
+  let _trainingPanel = 'workouts';
   let _modules = {};
   const TITLES = {
-    dashboard: 'Dashboard', workouts: 'Treinos', nutrition: 'Alimentação',
-    progress: 'Progresso', fitbot: 'FitBot IA', profile: 'Meu Perfil'
+    habits: 'Hábitos',
+    tasks: 'Tarefas',
+    workouts: 'Treinos',
+    goals: 'Metas',
+    profile: 'Perfil'
   };
 
   async function init() {
@@ -47,62 +51,86 @@ const FitnessApp = (() => {
     const r = await FitnessAPI.get('/api/auth/me');
     if (!r.ok) { window.location.href = '/'; return; }
 
-    const theme = localStorage.getItem('atlas_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('atlas_theme', 'dark');
 
     const user = (() => { try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch { return null; } })();
     const el = document.getElementById('userNameDisplay');
-    if (el && user) el.textContent = user.name || user.email;
+    if (el && user) el.textContent = user.name || user.email?.split('@')[0] || 'atleta';
 
-    const hour = new Date().getHours();
-    const gr = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
-    const grEl = document.getElementById('dashGreeting');
-    if (grEl) grEl.textContent = `${gr}${user?.name ? ', ' + user.name.split(' ')[0] : ''}! 💪`;
     const dEl = document.getElementById('dashDate');
-    if (dEl) dEl.textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    if (dEl) dEl.textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+
+    _modules = {
+      habits: Habits,
+      tasks: FitTasks,
+      workouts: Workouts,
+      goals: FitGoals,
+      profile: Profile
+    };
+
+    document.querySelectorAll('[data-section]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        navigate(link.dataset.section);
+      });
+    });
+
+    Object.values(_modules).forEach(m => { try { m.init?.(); } catch(e) { console.warn(e); } });
+    Nutrition.init?.();
 
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('app').classList.remove('hidden');
 
-    _modules = { dashboard: Dashboard, workouts: Workouts, nutrition: Nutrition, progress: Progress, fitbot: FitBot, profile: Profile };
-
-    document.querySelectorAll('.nav-item[data-section]').forEach(el => {
-      el.addEventListener('click', e => { e.preventDefault(); navigate(el.dataset.section); if (window.innerWidth <= 768) closeSidebar(); });
-    });
-
-    Object.values(_modules).forEach(m => { try { m.init?.(); } catch(e) { console.warn(e); } });
-
-    const last = sessionStorage.getItem('fitness_section') || 'dashboard';
+    const hash = location.hash.replace('#', '');
+    const last = hash && TITLES[hash] ? hash : sessionStorage.getItem('fitness_section') || 'habits';
     navigate(last);
+    updateStreak();
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
   }
 
   function navigate(section) {
-    if (!TITLES[section]) section = 'dashboard';
+    if (!TITLES[section]) section = 'habits';
     _current = section;
     sessionStorage.setItem('fitness_section', section);
+    if (location.hash.replace('#', '') !== section) location.hash = section;
 
     document.querySelectorAll('.section').forEach(s => {
       const active = s.id === `sec-${section}`;
       s.classList.toggle('active', active);
       s.classList.toggle('hidden', !active);
     });
-    document.querySelectorAll('.nav-item[data-section]').forEach(el => el.classList.toggle('active', el.dataset.section === section));
+    document.querySelectorAll('[data-section]').forEach(el => el.classList.toggle('active', el.dataset.section === section));
     const t = document.getElementById('topbarTitle');
     if (t) t.textContent = TITLES[section];
     const mod = _modules[section];
     if (mod?.render) { try { mod.render(); } catch(e) { console.warn(e); } }
+    if (section === 'workouts') renderTrainingPanel();
   }
 
-  function toggleSidebar() { if (window.innerWidth <= 768) document.getElementById('sidebar').classList.toggle('open'); }
-  function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+  function setTrainingPanel(panel) {
+    _trainingPanel = panel === 'diet' ? 'diet' : 'workouts';
+    renderTrainingPanel();
+  }
+
+  function renderTrainingPanel() {
+    document.querySelectorAll('.segmented [data-panel]').forEach(b => b.classList.toggle('active', b.dataset.panel === _trainingPanel));
+    document.getElementById('trainingPanelWorkouts')?.classList.toggle('hidden', _trainingPanel !== 'workouts');
+    document.getElementById('trainingPanelDiet')?.classList.toggle('hidden', _trainingPanel !== 'diet');
+    if (_trainingPanel === 'diet') Nutrition.render?.();
+    else Workouts.render?.();
+  }
+
+  function updateStreak() {
+    const count = Habits?.getBestStreak?.() || 0;
+    const el = document.getElementById('streakCount');
+    if (el) el.textContent = count;
+  }
 
   function toggleTheme() {
-    const cur = document.documentElement.getAttribute('data-theme');
-    const next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('atlas_theme', next);
+    document.documentElement.setAttribute('data-theme', 'dark');
+    toast('AtlasFit usa tema escuro por padrao.', 'info');
   }
 
   function openModal(title, body, buttons = []) {
@@ -125,7 +153,7 @@ const FitnessApp = (() => {
     document.getElementById('modalFooter').innerHTML = '';
   }
 
-  function toast(message, type = 'info', duration = 3500) {
+  function toast(message, type = 'info', duration = 3200) {
     const c = document.getElementById('toastContainer');
     const el = document.createElement('div');
     el.className = `toast ${type}`;
@@ -140,5 +168,5 @@ const FitnessApp = (() => {
 
   document.addEventListener('DOMContentLoaded', init);
 
-  return { navigate, toggleSidebar, closeSidebar, toggleTheme, openModal, closeModal, toast, today, fmtDate };
+  return { navigate, setTrainingPanel, renderTrainingPanel, updateStreak, toggleTheme, openModal, closeModal, toast, today, fmtDate };
 })();

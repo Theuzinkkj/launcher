@@ -5,7 +5,10 @@ const Workouts = (() => {
   const MUSCLE_GROUPS = ['Peito','Costas','Ombro','Bíceps','Tríceps','Pernas','Abdômen','Glúteos','Cardio'];
   const TYPES = { A:'Treino A', B:'Treino B', C:'Treino C', D:'Treino D', E:'Treino E', fullbody:'Full Body', hiit:'HIIT', cardio:'Cardio', personalizado:'Personalizado' };
 
-  async function init() { await load(); }
+  async function init() {
+    await load();
+    if (!document.getElementById('sec-workouts')?.classList.contains('hidden')) render();
+  }
 
   async function load() {
     const r = await FitnessAPI.get('/workouts');
@@ -33,7 +36,7 @@ const Workouts = (() => {
       <div style="font-size:.8125rem;color:var(--text-muted);margin-bottom:.875rem">${exercises.length} exercício(s)${w.estimated_duration?` · ~${w.estimated_duration}min`:''}</div>
       ${exercises.length ? `<div style="font-size:.8rem;color:var(--text-2);margin-bottom:.875rem;line-height:1.6">${exercises.slice(0,3).map(e=>`<div>• ${esc(e.name)} — ${e.sets}x${e.reps}${e.weight?' ('+e.weight+'kg)':''}</div>`).join('')}${exercises.length>3?`<div style="color:var(--text-muted)">e mais ${exercises.length-3}…</div>`:''}</div>` : ''}
       <div class="workout-actions">
-        <button class="btn btn-fit btn-sm" onclick="Workouts.openLogSession('${w.id}','${esc(w.name)}')">▶ Registrar</button>
+        <button class="btn btn-fit btn-sm" onclick="Workouts.openLogSession('${w.id}','${esc(w.name)}')">Iniciar Treino</button>
         <button class="btn btn-ghost btn-sm" onclick="Workouts.openEdit('${w.id}')">✏️ Editar</button>
         <button class="btn btn-ghost btn-sm" onclick="Workouts.deleteWorkout('${w.id}','${esc(w.name)}')" style="color:var(--danger)">🗑️</button>
       </div>

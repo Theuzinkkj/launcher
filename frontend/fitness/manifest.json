@@ -1,12 +1,12 @@
 {
-  "name": "FitHub - Fitness Pessoal",
-  "short_name": "FitHub",
-  "description": "App pessoal de fitness, treinos, nutricao e progresso.",
+  "name": "AtlasFit - Fitness Pessoal",
+  "short_name": "AtlasFit",
+  "description": "App fitness dark para habitos, tarefas, treinos, dieta, metas e perfil.",
   "start_url": "/fitness",
   "id": "/fitness",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#10b981",
+  "background_color": "#0a0a0a",
+  "theme_color": "#FFD600",
   "orientation": "any",
   "lang": "pt-BR",
   "scope": "/fitness/",
@@ -14,8 +14,9 @@
     { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ],
   "shortcuts": [
-    { "name": "Dashboard", "url": "/fitness#dashboard" },
+    { "name": "Hábitos", "url": "/fitness#habits" },
     { "name": "Treinos", "url": "/fitness#workouts" },
+    { "name": "Metas", "url": "/fitness#goals" },
     { "name": "Perfil", "url": "/fitness#profile" }
   ]
 }
