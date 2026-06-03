@@ -12,15 +12,35 @@ const Tools = (() => {
 
   function render() { setTool(_currentTool); }
 
+  function normalizeTool(tool) {
+    const aliases = {
+      password: 'passgen',
+      passgen: 'passgen',
+      pomodoro: 'pomodoro',
+      converters: 'converter',
+      converter: 'converter',
+      qrcode: 'qrcode',
+      qr: 'qrcode'
+    };
+    return aliases[tool] || 'passgen';
+  }
+
   function setTool(tool) {
+    tool = normalizeTool(tool);
     _currentTool = tool;
-    document.querySelectorAll('.tool-tab').forEach(t => t.classList.toggle('active', t.dataset.tool === tool));
+    document.querySelectorAll('.tool-tab').forEach(t => t.classList.toggle('active', normalizeTool(t.dataset.tool) === tool));
     const el = document.getElementById('toolContent');
     if (!el) return;
     if (tool === 'passgen') el.innerHTML = renderPassGen();
     else if (tool === 'pomodoro') { el.innerHTML = renderPomodoro(); startPomodoroUI(); }
     else if (tool === 'converter') el.innerHTML = renderConverter();
     else if (tool === 'qrcode') el.innerHTML = renderQRCode();
+  }
+
+  function setTab(btn, tool) {
+    document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+    btn?.classList.add('active');
+    setTool(tool);
   }
 
   // ===== GERADOR DE SENHAS =====
@@ -321,5 +341,5 @@ const Tools = (() => {
     }
   }
 
-  return { init, render, setTool, genPass, copyPass, pomToggle, pomReset, pomSetPhase, pomSaveSettings, showConv, calcTemp, calcWeight, calcLength, genQR };
+  return { init, render, setTool, setTab, genPass, copyPass, pomToggle, pomReset, pomSetPhase, pomSaveSettings, showConv, calcTemp, calcWeight, calcLength, genQR };
 })();
