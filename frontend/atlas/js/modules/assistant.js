@@ -65,7 +65,7 @@ const Assistant = (() => {
     const chat = document.getElementById('assistantChat');
     const el = document.createElement('div');
     el.className = 'assistant-message bot';
-    el.innerHTML = `<div class="bot-avatar"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/><path d="M18 4 L30 30 L6 30 Z" fill="currentColor" opacity="0.9"/><circle cx="18" cy="14" r="3" fill="white"/></svg></div><div class="message-bubble"><div class="bot-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+    el.innerHTML = `<div class="bot-avatar"><svg width="24" height="24" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/><path d="M18 4 L30 30 L6 30 Z" fill="currentColor" opacity="0.9"/><circle cx="18" cy="14" r="3" fill="white"/></svg></div><div class="message-bubble"><div class="bot-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
     chat?.appendChild(el);
     if (chat) chat.scrollTop = chat.scrollHeight;
     return el;
@@ -78,7 +78,7 @@ const Assistant = (() => {
     div.className = `assistant-message ${role}`;
     const content = isMarkdown ? renderMarkdown(text) : esc(text);
     if (role === 'bot') {
-      div.innerHTML = `<div class="bot-avatar"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/><path d="M18 4 L30 30 L6 30 Z" fill="currentColor" opacity="0.9"/><circle cx="18" cy="14" r="3" fill="white"/></svg></div><div class="message-bubble">${content}</div>`;
+      div.innerHTML = `<div class="bot-avatar"><svg width="24" height="24" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/><path d="M18 4 L30 30 L6 30 Z" fill="currentColor" opacity="0.9"/><circle cx="18" cy="14" r="3" fill="white"/></svg></div><div class="message-bubble">${content}</div>`;
     } else {
       div.innerHTML = `<div class="message-bubble">${esc(text)}</div>`;
     }
@@ -103,7 +103,7 @@ const Assistant = (() => {
     const chat = document.getElementById('assistantChat');
     if (!chat) return;
     const online = typeof Auth !== 'undefined' && Auth.isLoggedIn() && navigator.onLine;
-    chat.innerHTML = `<div class="assistant-message bot"><div class="bot-avatar"><svg viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/><path d="M18 4 L30 30 L6 30 Z" fill="currentColor" opacity="0.9"/><circle cx="18" cy="14" r="3" fill="white"/></svg></div><div class="message-bubble"><p>Conversa limpa! Como posso ajudar?</p><p style="font-size:.75rem;color:var(--text-muted);margin-top:.35rem">${online ? 'Powered by Llama 3.3 via Groq — dados reais do Supabase.' : 'Modo local ativo. Faça login para IA real.'}</p></div></div>`;
+    chat.innerHTML = `<div class="assistant-message bot"><div class="bot-avatar"><svg width="24" height="24" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/><path d="M18 4 L30 30 L6 30 Z" fill="currentColor" opacity="0.9"/><circle cx="18" cy="14" r="3" fill="white"/></svg></div><div class="message-bubble"><p>Conversa limpa! Como posso ajudar?</p><p style="font-size:.75rem;color:var(--text-muted);margin-top:.35rem">${online ? 'Powered by Llama 3.3 via Groq — dados reais do Supabase.' : 'Modo local ativo. Faça login para IA real.'}</p></div></div>`;
   }
 
   // ===== FALLBACK LOCAL =====

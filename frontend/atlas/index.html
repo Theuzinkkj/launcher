@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/atlas/css/app.css?v=2.1.3"/>
+  <link rel="stylesheet" href="/atlas/css/app.css?v=2.1.4"/>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 </head>
@@ -451,24 +451,26 @@
     <section id="sec-assistant" class="section hidden">
       <div class="section-header">
         <div><h2>Atlas Assistant</h2><span id="aiModeBadge" class="ai-badge">Verificando…</span></div>
-        <button class="btn btn-outline" onclick="Assistant.clear()">Limpar</button>
+        <button class="btn btn-outline" onclick="Assistant.clear()">Limpar conversa</button>
       </div>
       <div class="assistant-container">
         <div id="assistantChat" class="assistant-chat">
-          <div class="ai-message">
-            <span class="ai-avatar">🤖</span>
-            <div class="ai-bubble">Olá! Sou o Atlas Assistant. Posso ajudar com suas notas, tarefas, metas e muito mais. Como posso ajudar?</div>
+          <div class="assistant-message bot">
+            <div class="bot-avatar"><svg width="24" height="24" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="17" stroke="currentColor" stroke-width="1.5"/><path d="M18 4 L30 30 L6 30 Z" fill="currentColor" opacity="0.9"/><circle cx="18" cy="14" r="3" fill="white"/></svg></div>
+            <div class="message-bubble"><p>Olá! Sou o Atlas Assistant. Posso ajudar com suas notas, tarefas, metas e muito mais.</p></div>
           </div>
         </div>
         <div class="assistant-suggestions" id="assistantSuggestions">
-          <button class="suggestion-btn" onclick="Assistant.query('Quantas tarefas tenho pendentes?')">Tarefas pendentes</button>
-          <button class="suggestion-btn" onclick="Assistant.query('Mostre minhas metas ativas')">Metas ativas</button>
-          <button class="suggestion-btn" onclick="Assistant.query('O que tenho na agenda hoje?')">Agenda de hoje</button>
-          <button class="suggestion-btn" onclick="Assistant.query('Resumo geral do meu progresso')">Resumo geral</button>
+          <button class="suggestion-chip" onclick="Assistant.query('Quantas tarefas tenho pendentes?')">Tarefas pendentes</button>
+          <button class="suggestion-chip" onclick="Assistant.query('Mostre minhas metas ativas')">Metas ativas</button>
+          <button class="suggestion-chip" onclick="Assistant.query('O que tenho na agenda hoje?')">Agenda de hoje</button>
+          <button class="suggestion-chip" onclick="Assistant.query('Resumo geral do meu progresso')">Resumo geral</button>
         </div>
-        <div class="assistant-input-row">
-          <input type="text" id="assistantInput" placeholder="Pergunte qualquer coisa…" onkeydown="if(event.key==='Enter')Assistant.send()"/>
-          <button class="btn btn-atlas" onclick="Assistant.send()">Enviar</button>
+        <div class="assistant-input-area">
+          <div class="assistant-input-wrap">
+            <input class="assistant-input" type="text" id="assistantInput" placeholder="Pergunte qualquer coisa…" onkeydown="if(event.key==='Enter')Assistant.send()"/>
+            <button class="assistant-send-btn" onclick="Assistant.send()">Enviar</button>
+          </div>
         </div>
       </div>
     </section>
@@ -560,24 +562,24 @@
 </div>
 
 <!-- SCRIPTS -->
-<script src="/atlas/js/storage.js?v=2.1.3"></script>
-<script src="/atlas/js/crypto.js?v=2.1.3"></script>
-<script src="/atlas/js/api.js?v=2.1.3"></script>
-<script src="/atlas/js/auth.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/dashboard.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/vault.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/notes.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/todos.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/goals.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/calendar.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/diary.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/study.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/links.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/library.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/files.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/tools.js?v=2.1.3"></script>
-<script src="/atlas/js/modules/assistant.js?v=2.1.3"></script>
-<script src="/atlas/js/app.js?v=2.1.3"></script>
+<script src="/atlas/js/storage.js?v=2.1.4"></script>
+<script src="/atlas/js/crypto.js?v=2.1.4"></script>
+<script src="/atlas/js/api.js?v=2.1.4"></script>
+<script src="/atlas/js/auth.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/dashboard.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/vault.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/notes.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/todos.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/goals.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/calendar.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/diary.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/study.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/links.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/library.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/files.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/tools.js?v=2.1.4"></script>
+<script src="/atlas/js/modules/assistant.js?v=2.1.4"></script>
+<script src="/atlas/js/app.js?v=2.1.4"></script>
 <script>
   // Vault unlock helpers
   function withVaultTimeout(promise, label) {
